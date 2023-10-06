@@ -30,7 +30,7 @@ class RegistrationActivity : AppCompatActivity() {
             val email=binding.emailEt
             val password=binding.passwordEt
 
-            //TO-Do conditions for password verification
+            //TODO  conditions for password verification
 
             registerUser(email.text.toString(),password.text.toString())
 

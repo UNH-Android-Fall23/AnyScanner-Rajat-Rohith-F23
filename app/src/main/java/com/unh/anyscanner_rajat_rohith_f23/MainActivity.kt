@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
             val username=binding.usernameEt
             val password=binding.passwordEt
 
-            accountLogin(username.text.toString(),password.text.toString())
+           // accountLogin(username.text.toString(),password.text.toString())
             val intent = Intent(this, AnyScannerActivity::class.java)
             startActivity(intent)
 
@@ -48,16 +48,17 @@ class MainActivity : AppCompatActivity() {
             }else{
                 Log.d(TAG,"Logout")
             }
-
         }
+
+        //TODO- add functionality for forgot password
     }
 
     override fun onStart() {
         super.onStart()
         val currentUser=fbaseAuth.currentUser
-        if (currentUser!=null){
-            reload()
-        }
+       // if (currentUser!=null){
+         //   reload()
+        //}
     }
 
 
