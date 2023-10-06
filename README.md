@@ -1,6 +1,7 @@
 # AnyScanner-Rajat-Rohith-F23
 
-https://fontmeme.com/temporary/ebf7f230e6a433be3e772624b61982be.png![image](https://github.com/UNH-Android-Fall23/AnyScanner-Rajat-Rohith-F23/assets/41318720/ad5243f2-14b3-42ed-86b6-c9b74fa5f9aa)
+![ebf7f230e6a433be3e772624b61982be](https://github.com/UNH-Android-Fall23/AnyScanner-Rajat-Rohith-F23/assets/41318720/5d77baa5-a02a-4595-b44d-d1e50b8e1bc1)
+
 
 
 QR Code scanning app built for verifying the integrity of QR code with additional features to check for WiFi security and Root detection.
