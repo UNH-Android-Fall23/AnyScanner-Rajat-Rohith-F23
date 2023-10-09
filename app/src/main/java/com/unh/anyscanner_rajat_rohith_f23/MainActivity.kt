@@ -1,5 +1,6 @@
 package com.unh.anyscanner_rajat_rohith_f23
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -12,7 +13,7 @@ import com.unh.anyscanner_rajat_rohith_f23.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
 
     private lateinit var fbaseAuth: FirebaseAuth
-    private val TAG = "Login_Signup"
+    private val TAG = "LoginActivity"
     private lateinit var binding : ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,16 +28,37 @@ class MainActivity : AppCompatActivity() {
             val username=binding.usernameEt
             val password=binding.passwordEt
 
-            accountLogin(username.text.toString(),password.text.toString())
+           // accountLogin(username.text.toString(),password.text.toString())
+            val intent = Intent(this, AnyScannerActivity::class.java)
+            startActivity(intent)
+
         }
+
+        binding.registerText.setOnClickListener {
+            val intent = Intent(this, RegistrationActivity::class.java)
+            startActivity(intent)
+        }
+
+        binding.fingerprintText.setOnClickListener {
+
+            FirebaseAuth.getInstance().signOut();
+            val currentUser=fbaseAuth.currentUser
+            if(currentUser!=null){
+                Log.d(TAG,"Logout Unsuccesful")
+            }else{
+                Log.d(TAG,"Logout")
+            }
+        }
+
+        //TODO- add functionality for forgot password
     }
 
     override fun onStart() {
         super.onStart()
         val currentUser=fbaseAuth.currentUser
-        if (currentUser!=null){
-            reload()
-        }
+       // if (currentUser!=null){
+         //   reload()
+        //}
     }
 
 
