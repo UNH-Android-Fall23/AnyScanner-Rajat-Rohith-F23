@@ -1,83 +1,58 @@
 package com.unh.anyscanner_rajat_rohith_f23
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import android.view.View
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.unh.anyscanner_rajat_rohith_f23.databinding.ActivityMainBinding
 
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var fbaseAuth: FirebaseAuth
-    private val TAG = "LoginActivity"
     private lateinit var binding : ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        binding=ActivityMainBinding.inflate(layoutInflater)
+        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView((binding.root))
-        //initializing Firebase Authorizer
-        fbaseAuth=Firebase.auth
-
-        binding.loginBtn.setOnClickListener{
-            val username=binding.usernameEt
-            val password=binding.passwordEt
-
-           // accountLogin(username.text.toString(),password.text.toString())
-            val intent = Intent(this, AnyScannerActivity::class.java)
-            startActivity(intent)
-
-        }
+        fbaseAuth = Firebase.auth
 
         binding.registerText.setOnClickListener {
-            val intent = Intent(this, RegistrationActivity::class.java)
-            startActivity(intent)
+            goToREActivity(view = null)
         }
 
-        binding.fingerprintText.setOnClickListener {
+        binding.loginBtn.setOnClickListener {
+            val username = binding.usernameEt
+            val password = binding.passwordEt
+            fbaseAuth.signInWithEmailAndPassword(username.toString(), password.toString())
+                .addOnCompleteListener(this) { task ->
+                        val user = fbaseAuth.currentUser
+                    if(user!=null){
 
-            FirebaseAuth.getInstance().signOut();
-            val currentUser=fbaseAuth.currentUser
-            if(currentUser!=null){
-                Log.d(TAG,"Logout Unsuccesful")
-            }else{
-                Log.d(TAG,"Logout")
-            }
-        }
-
-        //TODO- add functionality for forgot password
-    }
-
-    override fun onStart() {
-        super.onStart()
-        val currentUser=fbaseAuth.currentUser
-       // if (currentUser!=null){
-         //   reload()
-        //}
-    }
-
-
-
-    private fun accountLogin(username: String, password: String){
-        fbaseAuth.signInWithEmailAndPassword(username, password)
-            .addOnCompleteListener(this){task ->
-                if (task.isSuccessful){
-                    Log.d(TAG, "Login Successfull!")
-                    val user=fbaseAuth.currentUser
-                    updateUI(user)
+                        goToqrActivity(view = null)
+                    }
+                    }
                 }
-
-            }
+        }
+    fun goToqrActivity(view: View?) {
+        val intent = Intent(this, Qr_Activity::class.java)
+        startActivity(intent)
     }
-
-    private fun reload() {
-        TODO("Not yet implemented")
+    fun goToREActivity(view: View?) {
+        val intent = Intent(this, RegistrationActivity::class.java)
+        startActivity(intent)
     }
-    private fun updateUI(user: FirebaseUser?) {
+    public override fun onStart() {
+        super.onStart()
+        val currentUser = fbaseAuth.currentUser
+        if (currentUser != null) {
+        //  goToqrActivity(view = null)
+        }
     }
 }

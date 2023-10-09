@@ -1,17 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout  xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:layout_width="90dp"
-        android:layout_height="90dp"
-        android:src="@drawable/ic_launcher_background"
-        app:layout_constraintBottom_toTopOf="@+id/relative_layout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
 
     <RelativeLayout
@@ -29,78 +21,104 @@
             android:id="@+id/username_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignStart="@id/username_et"
+            android:layout_alignStart="@id/usernameEt"
             android:padding="5dp"
 
-            android:text="Username / Email " />
+            android:text="Email " />
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/username_et"
+            android:id="@+id/usernameEt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/username_text"
             android:layout_centerInParent="true"
             android:ems="15"
-            android:hint="Enter username or email"/>
+            android:hint="Enter email" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/password_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/username_et"
-            android:layout_alignStart="@id/password_et"
+            android:layout_below="@+id/usernameEt"
+            android:layout_alignStart="@id/passwordEt"
             android:padding="5dp"
             android:text="Password" />
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/password_et"
+            android:id="@+id/passwordEt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/password_text"
             android:layout_centerInParent="true"
             android:ems="15"
-            android:hint="Enter Password" />
+            android:hint="Enter Password"
+            android:password="true" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/fingerprint_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/password_et"
-            android:layout_alignStart="@id/password_et"
+            android:layout_below="@id/passwordEt"
+            android:layout_alignStart="@id/passwordEt"
             android:padding="3dp"
-            android:text="Use Fingerprint"
+            android:text="Use Biometrics"
             android:textColor="#2180F3" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/login_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/fingerprint_text"
-            android:layout_centerInParent="true"
-            android:padding="3dp"
-            android:text="Login" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/password_et"
-            android:layout_alignEnd="@id/password_et"
-            android:padding="3dp"
-            android:text="Forgot Password"
-            android:textColor="#2180F3" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/register_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/login_btn"
-            android:layout_centerHorizontal="true"
-            android:padding="3dp"
-            android:text="New Here, sign up?"
-            android:textColor="#2180F3"
-            android:clickable="true"/>
 
 
     </RelativeLayout>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/register_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:padding="3dp"
+        android:text="Need an account?Sign up"
+        android:textColor="#2180F3"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.526"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.941" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/materialTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:text="Forgot Password"
+        android:textColor="#2180F3"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.717" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="258dp"
+        android:layout_height="195dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.111"
+        app:srcCompat="@drawable/screenshot_2023_10_09_at_9_00_04_am" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/login_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:text="Login"
+        app:backgroundTint="#121111"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.663" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
