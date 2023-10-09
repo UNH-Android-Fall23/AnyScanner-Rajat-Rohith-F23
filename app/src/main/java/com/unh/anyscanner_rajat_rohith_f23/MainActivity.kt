@@ -3,7 +3,6 @@ package com.unh.anyscanner_rajat_rohith_f23
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -12,7 +11,7 @@ import com.unh.anyscanner_rajat_rohith_f23.databinding.ActivityMainBinding
 
 
 class MainActivity : AppCompatActivity() {
-
+    private val TAG = "IcebreakerAndroidF23Tag"
     private lateinit var fbaseAuth: FirebaseAuth
     private lateinit var binding : ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,13 +27,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.loginBtn.setOnClickListener {
-            val username = binding.usernameEt
-            val password = binding.passwordEt
-            fbaseAuth.signInWithEmailAndPassword(username.toString(), password.toString())
+            val username = binding.editTextTextEmailAddress2
+            val password = binding.editTextTextPassword
+            fbaseAuth.signInWithEmailAndPassword(username.text.toString(), password.text.toString())
                 .addOnCompleteListener(this) { task ->
                         val user = fbaseAuth.currentUser
                     if(user!=null){
-
                         goToqrActivity(view = null)
                     }
                     }
@@ -52,7 +50,7 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         val currentUser = fbaseAuth.currentUser
         if (currentUser != null) {
-        //  goToqrActivity(view = null)
+            goToqrActivity(view = null)
         }
     }
 }
