@@ -19,15 +19,23 @@ import javax.mail.internet.MimeMessage
 
 class Forgot_Password_Verfifcation : AppCompatActivity() {
     private lateinit var binding: ActivityForgotPasswordVerfifcationBinding
-    private lateinit var i: String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_forgot_password_verfifcation)
         binding = ActivityForgotPasswordVerfifcationBinding.inflate(layoutInflater)
         setContentView((binding.root))
 
+        lateinit var i: String
+        val rnd = Random()
+        val number: Int = rnd.nextInt(999999)
+        i=number.toString()
+        lateinit var email: String
+
         binding.button.setOnClickListener {
-            val email = binding.editTextTextEmailAddress.text.toString()
+            email = binding.editTextTextEmailAddress.text.toString()
+            if(email==""){
+                binding.editTextTextEmailAddress.error="Field Required"
+            }
             if (!isValidEmail(email)) {
                 binding.editTextTextEmailAddress.error = "Enter a valid email"
             } else {
@@ -37,9 +45,6 @@ class Forgot_Password_Verfifcation : AppCompatActivity() {
                     if (documents.isEmpty) {
                         binding.editTextTextEmailAddress.error = "This Email needs sign up"
                     } else {
-                        val rnd = Random()
-                        val number: Int = rnd.nextInt(999999)
-                        i=number.toString()
                         sendEmail(email,i)
                     }
                 }
@@ -48,7 +53,7 @@ class Forgot_Password_Verfifcation : AppCompatActivity() {
         binding.button2.setOnClickListener{
             val j=binding.editTextNumber.text.toString()
             if(j==i){
-                goToPCActivity(view = null)
+                goToPCActivity(view = null,email)
             }
             else{
                 binding.editTextNumber.error="Code Does not match"
@@ -56,9 +61,11 @@ class Forgot_Password_Verfifcation : AppCompatActivity() {
         }
     }
 
-    private fun goToPCActivity(view: Nothing?) {
+    private fun goToPCActivity(view: Nothing?,email: String) {
         val intent = Intent(this, PasswordChange::class.java)
+        intent.putExtra("email", email)
         startActivity(intent)
+        finish()
     }
 
     fun sendEmail(email: String,i:String) {

@@ -94,5 +94,6 @@ class RegistrationActivity : AppCompatActivity() {
     fun goToqrActivity(view: View?) {
         val intent = Intent(this, Qr_Activity::class.java)
         startActivity(intent)
+        finish()
     }
 }

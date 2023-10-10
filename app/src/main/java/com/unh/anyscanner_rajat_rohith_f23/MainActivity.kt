@@ -104,6 +104,7 @@ class MainActivity : AppCompatActivity() {
         fun goToqrActivity(view: View?) {
             val intent = Intent(this, Qr_Activity::class.java)
             startActivity(intent)
+            finish()
         }
 
         fun goToREActivity(view: View?) {
