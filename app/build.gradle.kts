@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.Packaging
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -8,6 +10,12 @@ android {
     namespace = "com.unh.anyscanner_rajat_rohith_f23"
     compileSdk = 33
 
+    packaging {
+        resources {
+            excludes +=("META-INF/NOTICE.md")
+            excludes +=("META-INF/LICENSE.md")
+        }
+    }
     defaultConfig {
         applicationId = "com.unh.anyscanner_rajat_rohith_f23"
         minSdk = 31
@@ -58,5 +66,7 @@ dependencies {
     //implementation("com.github.yuriy-budiyev:code-scanner:2.3.2")
     //implementation("androidx.navigation:navigation-ui-ktx:2.7.3")
     //implementation("androidx.navigation:navigation-fragment-ktx:2.7.3")
+    implementation ("com.sun.mail:android-mail:1.6.7")
+    implementation ("com.sun.mail:android-activation:1.6.7")
 
 }

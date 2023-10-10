@@ -35,6 +35,10 @@ class MainActivity : AppCompatActivity() {
             goToREActivity(view = null)
         }
 
+        binding.materialTextView.setOnClickListener {
+            goToFPActivity(view = null)
+        }
+
         binding.loginBtn.setOnClickListener {
             var passwordMatched = false
             val username = binding.editTextTextEmailAddress2
@@ -106,6 +110,10 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, RegistrationActivity::class.java)
             startActivity(intent)
         }
+    fun goToFPActivity(view: View?) {
+        val intent = Intent(this, Forgot_Password_Verfifcation::class.java)
+        startActivity(intent)
+    }
     fun isValidEmail(target: CharSequence?): Boolean {
         return !TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches()
     }
