@@ -78,7 +78,8 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         val currentUser = fbaseAuth.currentUser
         if (currentUser != null) {
-           goToqrActivity(view = null)
+           //goToqrActivity(view = null)
+        FirebaseAuth.getInstance().signOut()
         }
     }
 }

@@ -53,7 +53,10 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.android.gms:play-services-auth:20.7.0")
+    implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation ("com.google.firebase:firebase-firestore-ktx:24.8.1")
     implementation("com.github.yuriy-budiyev:code-scanner:2.3.2")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.3")
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.3")
+
 }
