@@ -3,7 +3,9 @@ package com.unh.anyscanner_rajat_rohith_f23
 import android.content.Intent
 import android.nfc.Tag
 import android.os.Bundle
+import android.text.TextUtils
 import android.util.Log
+import android.util.Patterns
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -20,7 +22,6 @@ import kotlinx.coroutines.tasks.await
 
 class MainActivity : AppCompatActivity() {
     private lateinit var fbaseAuth: FirebaseAuth
-    private val tag="idk"
     private lateinit var binding : ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,48 +45,53 @@ class MainActivity : AppCompatActivity() {
             if (password.text.toString() == "") {
                 binding.editTextTextPassword.error = "Field Required"
             }
-            val query = FirebaseFirestore.getInstance().collection("users")
-                .whereEqualTo("Email", username.text.toString()).get()
-            query.addOnSuccessListener { documents ->
-                if (documents.isEmpty) {
-                    binding.editTextTextEmailAddress2.error = "This Email needs sign up"
-                } else {
-                    for (document in documents) {
-                        val userData = document.data
-                        if (userData["Password"] != password.text.toString()) {
-                            binding.editTextTextPassword.error = "Password does not match"
-                        }
-                        if (userData["Password"] == password.text.toString()) {
-                            passwordMatched=true
+            if (!isValidEmail(username.text.toString())) {
+                binding.editTextTextEmailAddress2.error = "Enter a valid email"
+            } else {
+                val query = FirebaseFirestore.getInstance().collection("users")
+                    .whereEqualTo("Email", username.text.toString()).get()
+                query.addOnSuccessListener { documents ->
+                    if (documents.isEmpty) {
+                        binding.editTextTextEmailAddress2.error = "This Email needs sign up"
+                    } else {
+                        for (document in documents) {
+                            val userData = document.data
+                            if (userData["Password"] != password.text.toString()) {
+                                binding.editTextTextPassword.error = "Password does not match"
+                            }
+                            if (userData["Password"] == password.text.toString()) {
+                                passwordMatched = true
+                            }
                         }
                     }
-                }
-                if(passwordMatched){
-                    fbaseAuth.signInWithEmailAndPassword(
-                        username.text.toString(),
-                        password.text.toString()
-                    )
-                        .addOnCompleteListener(this) { task ->
-                            if (task.isSuccessful) {
-                                val user = fbaseAuth.currentUser
-                                if (user != null) {
-                                    goToqrActivity(view = null)
-                                }
-                            } else {
-                                when ((task.exception as FirebaseAuthException?)!!.errorCode) {
-                                    "ERROR_INVALID_EMAIL" -> binding.editTextTextEmailAddress2.error =
-                                        "INVALID EMAIL"
+                    if (passwordMatched) {
+                        fbaseAuth.signInWithEmailAndPassword(
+                            username.text.toString(),
+                            password.text.toString()
+                        )
+                            .addOnCompleteListener(this) { task ->
+                                if (task.isSuccessful) {
+                                    val user = fbaseAuth.currentUser
+                                    if (user != null) {
+                                        goToqrActivity(view = null)
+                                    }
+                                } else {
+                                    when ((task.exception as FirebaseAuthException?)!!.errorCode) {
+                                        "ERROR_INVALID_EMAIL" -> binding.editTextTextEmailAddress2.error =
+                                            "INVALID EMAIL"
 
-                                    "ERROR_WRONG_PASSWORD" -> binding.editTextTextPassword.error =
-                                        "INVALID PASSWORD"
+                                        "ERROR_WRONG_PASSWORD" -> binding.editTextTextPassword.error =
+                                            "INVALID PASSWORD"
 
-                                    else -> {
-                                        binding.editTextTextEmailAddress2.error = "INVALID EMAIL"
-                                        binding.editTextTextPassword.error = "INVALID PASSWORD"
+                                        else -> {
+                                            binding.editTextTextEmailAddress2.error =
+                                                "INVALID EMAIL"
+                                            binding.editTextTextPassword.error = "INVALID PASSWORD"
+                                        }
                                     }
                                 }
                             }
-                        }
+                    }
                 }
             }
         }
@@ -100,6 +106,9 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, RegistrationActivity::class.java)
             startActivity(intent)
         }
+    fun isValidEmail(target: CharSequence?): Boolean {
+        return !TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches()
+    }
 
         public override fun onStart() {
             super.onStart()
