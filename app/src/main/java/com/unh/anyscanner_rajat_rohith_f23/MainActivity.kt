@@ -11,12 +11,16 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseAuthMultiFactorException
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.ktx.Firebase
 import com.unh.anyscanner_rajat_rohith_f23.databinding.ActivityMainBinding
+import kotlinx.coroutines.tasks.await
 
 
 class MainActivity : AppCompatActivity() {
     private lateinit var fbaseAuth: FirebaseAuth
+    private val tag="idk"
     private lateinit var binding : ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,13 +35,32 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.loginBtn.setOnClickListener {
+            var passwordMatched = false
             val username = binding.editTextTextEmailAddress2
             val password = binding.editTextTextPassword
             if (username.text.toString() == "") {
                 binding.editTextTextEmailAddress2.error = "Field Required"
-            } else if (password.text.toString() == "") {
+            }
+            if (password.text.toString() == "") {
                 binding.editTextTextPassword.error = "Field Required"
-            } else {
+            }
+            val query = FirebaseFirestore.getInstance().collection("users")
+                .whereEqualTo("Email", username.text.toString()).get()
+            query.addOnSuccessListener { documents ->
+                if (documents.isEmpty) {
+                    binding.editTextTextEmailAddress2.error = "This Email needs sign up"
+                } else {
+                    for (document in documents) {
+                        val userData = document.data
+                        if (userData["Password"] != password.text.toString()) {
+                            binding.editTextTextPassword.error = "Password does not match"
+                        }
+                        if (userData["Password"] == password.text.toString()) {
+                            passwordMatched=true
+                        }
+                    }
+                }
+                if(passwordMatched){
                     fbaseAuth.signInWithEmailAndPassword(
                         username.text.toString(),
                         password.text.toString()
@@ -53,7 +76,8 @@ class MainActivity : AppCompatActivity() {
                                     "ERROR_INVALID_EMAIL" -> binding.editTextTextEmailAddress2.error =
                                         "INVALID EMAIL"
 
-                                    "ERROR_WRONG_PASSWORD" -> binding.editTextTextPassword.error = "INVALID PASSWORD"
+                                    "ERROR_WRONG_PASSWORD" -> binding.editTextTextPassword.error =
+                                        "INVALID PASSWORD"
 
                                     else -> {
                                         binding.editTextTextEmailAddress2.error = "INVALID EMAIL"
@@ -62,24 +86,28 @@ class MainActivity : AppCompatActivity() {
                                 }
                             }
                         }
+                }
             }
         }
     }
 
-    fun goToqrActivity(view: View?) {
-        val intent = Intent(this, Qr_Activity::class.java)
-        startActivity(intent)
-    }
-    fun goToREActivity(view: View?) {
-        val intent = Intent(this, RegistrationActivity::class.java)
-        startActivity(intent)
-    }
-    public override fun onStart() {
-        super.onStart()
-        val currentUser = fbaseAuth.currentUser
-        if (currentUser != null) {
-           //goToqrActivity(view = null)
-        FirebaseAuth.getInstance().signOut()
+        fun goToqrActivity(view: View?) {
+            val intent = Intent(this, Qr_Activity::class.java)
+            startActivity(intent)
+        }
+
+        fun goToREActivity(view: View?) {
+            val intent = Intent(this, RegistrationActivity::class.java)
+            startActivity(intent)
+        }
+
+        public override fun onStart() {
+            super.onStart()
+            val currentUser = fbaseAuth.currentUser
+            if (currentUser != null) {
+                //goToqrActivity(view = null)
+                FirebaseAuth.getInstance().signOut()
+            }
         }
     }
-}
+
