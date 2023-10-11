@@ -87,7 +87,7 @@ class RegistrationActivity : AppCompatActivity() {
                         goToqrActivity(view = null)
                     }
                 } else {
-                    binding.emailEt.error="Enter a valid email"
+                    binding.emailEt.error="Email already signed up"
                     }
                     }
                 }
