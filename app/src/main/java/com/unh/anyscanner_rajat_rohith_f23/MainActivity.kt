@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
             val username=binding.usernameEt
             val password=binding.passwordEt
 
-           // accountLogin(username.text.toString(),password.text.toString())
+            accountLogin(username.text.toString(),password.text.toString())
             val intent = Intent(this, AnyScannerActivity::class.java)
             startActivity(intent)
 
