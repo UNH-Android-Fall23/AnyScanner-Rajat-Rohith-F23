@@ -63,6 +63,12 @@ class PasswordChange : AppCompatActivity() {
                     }
             }
         }
+        binding.backBtn.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
     }
 
     fun goToqrActivity(view: View?) {
