@@ -1,21 +1,24 @@
 package com.unh.anyscanner_rajat_rohith_f23
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
+import android.text.TextUtils
+import android.util.Patterns
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.unh.anyscanner_rajat_rohith_f23.databinding.ActivityRegistrationBinding
 
+
 class RegistrationActivity : AppCompatActivity() {
 
     private lateinit var fbaseAuth: FirebaseAuth
-    private val TAG = "Signup_Activity"
+    private var db:FirebaseFirestore = FirebaseFirestore.getInstance()
     private lateinit var binding : ActivityRegistrationBinding
+    val add = HashMap<String,Any>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registration)
@@ -25,44 +28,69 @@ class RegistrationActivity : AppCompatActivity() {
         fbaseAuth=Firebase.auth
 
 
-        //on-click listener for registration
         binding.registerBtn.setOnClickListener{
+            val fname=binding.firstNameEt
+            val lname=binding.lastNameEt
             val email=binding.emailEt
             val password=binding.passwordEt
+            val Repass=binding.repeatPasswordEt
 
-            //TODO  conditions for password verification
-
-            registerUser(email.text.toString(),password.text.toString())
-
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+            if(fname.text.toString()==""){
+                binding.firstNameEt.error="Field Required"
+            }
+            else if(lname.text.toString()==""){
+                binding.lastNameEt.error="Field Required"
+            }
+            else if(email.text.toString()==""){
+                binding.emailEt.error="Field Required"
+            }
+            else if(password.text.toString()==""){
+                binding.passwordEt.error="Field Required"
+            }
+            else if(Repass.text.toString()==""){
+                binding.repeatPasswordEt.error="Field Required"
+            }
+            else if(!isValidEmail(email.text.toString())){
+                binding.emailEt.error="Enter a valid email"
+            }
+            else if((password.text.toString().length)<=6){
+                binding.passwordEt.error="Password should be greater than 6 characters"
+            }
+            else if(password.text.toString()!=Repass.text.toString()){
+                binding.repeatPasswordEt.error="Password does not match"
+            }
+            else {
+                registerUser(binding.firstNameEt.text.toString(),binding.lastNameEt.text.toString(),email.text.toString(), password.text.toString())
+            }
         }
 
     }
+    fun isValidEmail(target: CharSequence?): Boolean {
+        return !TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches()
+    }
 
-
-
-    private fun registerUser(email: String, password: String) {
+    private fun registerUser(fname:String, lname:String, email: String, password: String) {
 
         fbaseAuth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
+                val user = fbaseAuth.currentUser
                 if (task.isSuccessful) {
-                    Log.d(TAG, "Registration Successfull")
-                    val user = fbaseAuth.currentUser
-                    updateUI(user)
+                    if (user != null) {
+                        add["FirstName"]= fname
+                        add["LastName"]= lname
+                        add["Password"]= password
+                        add["Email"]= email
+                        db.collection("users").add(add)
+                        goToqrActivity(view = null)
+                    }
                 } else {
-                    Log.w(TAG, "createUserWithEmail:failure", task.exception)
-                    Toast.makeText(
-                        baseContext,
-                        "Authentication failed.",
-                        Toast.LENGTH_SHORT,
-                    ).show()
-                    updateUI(null)
+                    binding.emailEt.error="Email already signed up"
+                    }
+                    }
                 }
-            }
+    fun goToqrActivity(view: View?) {
+        val intent = Intent(this, AnyScannerActivity::class.java)
+        startActivity(intent)
+        finish()
     }
-
-    private fun updateUI(user: FirebaseUser?) {
-    }
-
 }

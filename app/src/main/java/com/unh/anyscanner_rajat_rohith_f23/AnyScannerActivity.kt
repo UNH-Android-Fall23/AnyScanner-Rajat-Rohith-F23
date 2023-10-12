@@ -25,7 +25,7 @@ class AnyScannerActivity : AppCompatActivity() {
 
         val navView: BottomNavigationView = binding.bottomNavView
 
-        val navController = findNavController(R.id.activity_main_nav_host)
+        //val navController = findNavController(R.id.activity_main_nav_host)
 
         val appBarConfiguration = AppBarConfiguration(
             setOf(
@@ -36,7 +36,7 @@ class AnyScannerActivity : AppCompatActivity() {
         //set runtime permission camera
        // activityResultLauncher.launch(arrayOf(android.Manifest.permission.CAMERA))
 
-        setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
+        //setupActionBarWithNavController(navController, appBarConfiguration)
+        //navView.setupWithNavController(navController)
     }
 }
