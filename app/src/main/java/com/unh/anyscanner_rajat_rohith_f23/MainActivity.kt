@@ -1,23 +1,17 @@
 package com.unh.anyscanner_rajat_rohith_f23
 
 import android.content.Intent
-import android.nfc.Tag
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import android.util.Patterns
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
-import com.google.firebase.auth.FirebaseAuthMultiFactorException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.ktx.Firebase
 import com.unh.anyscanner_rajat_rohith_f23.databinding.ActivityMainBinding
-import kotlinx.coroutines.tasks.await
 
 
 class MainActivity : AppCompatActivity() {
@@ -102,7 +96,7 @@ class MainActivity : AppCompatActivity() {
     }
 
         fun goToqrActivity(view: View?) {
-            val intent = Intent(this, Qr_Activity::class.java)
+            val intent = Intent(this, AnyScannerActivity::class.java)
             startActivity(intent)
             finish()
         }

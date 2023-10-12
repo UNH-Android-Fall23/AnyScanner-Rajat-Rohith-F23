@@ -3,14 +3,10 @@ package com.unh.anyscanner_rajat_rohith_f23
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.ktx.Firebase
-import com.unh.anyscanner_rajat_rohith_f23.databinding.ActivityForgotPasswordVerfifcationBinding
 import com.unh.anyscanner_rajat_rohith_f23.databinding.ActivityPasswordChangeBinding
 
 class PasswordChange : AppCompatActivity() {
@@ -70,7 +66,7 @@ class PasswordChange : AppCompatActivity() {
     }
 
     fun goToqrActivity(view: View?) {
-        val intent = Intent(this, Qr_Activity::class.java)
+        val intent = Intent(this, AnyScannerActivity::class.java)
         startActivity(intent)
         finish()
     }

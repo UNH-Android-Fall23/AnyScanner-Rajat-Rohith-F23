@@ -20,7 +20,7 @@
             android:name=".Forgot_Password_Verfifcation"
             android:exported="true" />
         <activity
-            android:name=".Qr_Activity"
+            android:name=".AnyScannerActivity"
             android:exported="true" />
         <activity
             android:name=".RegistrationActivity"
