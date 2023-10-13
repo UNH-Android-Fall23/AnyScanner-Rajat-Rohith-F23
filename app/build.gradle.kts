@@ -70,3 +70,4 @@ dependencies {
     implementation ("com.sun.mail:android-activation:1.6.7")
 
 }
+

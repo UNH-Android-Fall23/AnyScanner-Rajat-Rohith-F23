@@ -38,16 +38,16 @@ class RegistrationActivity : AppCompatActivity() {
             if(fname.text.toString()==""){
                 binding.firstNameEt.error="Field Required"
             }
-            else if(lname.text.toString()==""){
+            if(lname.text.toString()==""){
                 binding.lastNameEt.error="Field Required"
             }
-            else if(email.text.toString()==""){
+            if(email.text.toString()==""){
                 binding.emailEt.error="Field Required"
             }
-            else if(password.text.toString()==""){
+            if(password.text.toString()==""){
                 binding.passwordEt.error="Field Required"
             }
-            else if(Repass.text.toString()==""){
+            if(Repass.text.toString()==""){
                 binding.repeatPasswordEt.error="Field Required"
             }
             else if(!isValidEmail(email.text.toString())){
