@@ -59,11 +59,6 @@ class Forgot_Password_Verfifcation : AppCompatActivity() {
                 binding.editTextNumber.error="Code Does not match"
             }
         }
-        binding.backBtn.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-            finish()
-        }
 
     }
 
