@@ -3,21 +3,16 @@ package com.unh.anyscanner_rajat_rohith_f23
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import android.util.Patterns
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.GoogleApiClient
-import com.google.android.gms.common.api.internal.OnConnectionFailedListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.GoogleAuthProvider
@@ -25,6 +20,8 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.unh.anyscanner_rajat_rohith_f23.databinding.ActivityMainBinding
+import androidx.biometric.BiometricPrompt
+import androidx.fragment.app.FragmentActivity
 
 
 class MainActivity : AppCompatActivity() {
@@ -47,6 +44,34 @@ class MainActivity : AppCompatActivity() {
             .build()
 
         googleSignInClient = GoogleSignIn.getClient(this, gso)
+
+        val biometricPromptInfo = BiometricPrompt.PromptInfo.Builder()
+            .setTitle("Biometric Login")
+            .setSubtitle("Authenticate using your fingerprint")
+            .setDescription("Touch the fingerprint sensor to log in to AnyScanner")
+            .setNegativeButtonText("Cancel")
+            .build()
+
+        val biometricPrompt = BiometricPrompt(this, mainExecutor, object : BiometricPrompt.AuthenticationCallback() {
+            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                super.onAuthenticationError(errorCode, errString)
+                Toast.makeText(applicationContext, errString, Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                super.onAuthenticationSucceeded(result)
+                goToqrActivity(view = null)
+            }
+
+            override fun onAuthenticationFailed() {
+                super.onAuthenticationFailed()
+                Toast.makeText(applicationContext, "Biometric Login Failed", Toast.LENGTH_SHORT).show()
+            }
+        })
+
+        binding.materialTextView2.setOnClickListener {
+            biometricPrompt.authenticate(biometricPromptInfo)
+        }
 
         binding.google.setOnClickListener {
             signInWithGoogle()
@@ -155,9 +180,7 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         val currentUser = fbaseAuth.currentUser
         if (currentUser != null) {
-            //goToqrActivity(view = null)
-            FirebaseAuth.getInstance().signOut()
-            googleSignInClient.signOut()
+            goToqrActivity(view = null)
         }
     }
 

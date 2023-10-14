@@ -68,6 +68,7 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:2.2.0")
     implementation ("com.sun.mail:android-mail:1.6.7")
     implementation ("com.sun.mail:android-activation:1.6.7")
+    implementation ("androidx.biometric:biometric:1.1.0")
 
 }
 
