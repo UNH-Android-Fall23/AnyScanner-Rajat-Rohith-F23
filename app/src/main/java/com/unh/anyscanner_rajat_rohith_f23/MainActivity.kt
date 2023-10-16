@@ -3,6 +3,7 @@ package com.unh.anyscanner_rajat_rohith_f23
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.util.Patterns
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -17,6 +18,7 @@ import com.unh.anyscanner_rajat_rohith_f23.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
     private lateinit var fbaseAuth: FirebaseAuth
     private lateinit var binding : ActivityMainBinding
+    private val TAG= "AnyScannerTag"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -34,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.loginBtn.setOnClickListener {
-            var passwordMatched = false
+          /*  var passwordMatched = false
             val username = binding.editTextTextEmailAddress2
             val password = binding.editTextTextPassword
             if (username.text.toString() == "") {
@@ -92,7 +94,14 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+
+           */
+
+            goToqrActivity(view = null)
+            Log.d(TAG,"Anyscanner opened")
         }
+
+
     }
 
         fun goToqrActivity(view: View?) {
