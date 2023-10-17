@@ -3,28 +3,41 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_main"
-    app:startDestination="@id/qrFragment">
+    app:startDestination="@id/qrFragment"
+    >
 
     <fragment
         android:id="@+id/qrFragment"
         android:name="com.unh.anyscanner_rajat_rohith_f23.QRFragment"
-        android:label="qr_fragment"
-        tools:layout="@layout/fragment_q_r"/>
+        android:label="qr"
+        tools:layout="@layout/fragment_q_r">
+        <action
+            android:id="@+id/action_qrFragment_to_wifiFragment"
+            app:destination="@id/wifiFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/wifiFragment"
         android:name="com.unh.anyscanner_rajat_rohith_f23.WiFiFragment"
-        android:label="wifi_fragment"
-        tools:layout="@layout/fragment_wi_fi"/>
+        android:label="wifi"
+        tools:layout="@layout/fragment_wi_fi">
+        <action
+            android:id="@+id/action_wifiFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
     <fragment
         android:id="@+id/rootFragment"
         android:name="com.unh.anyscanner_rajat_rohith_f23.RootFragment"
-        android:label="wifi_fragment"
+        android:label="wifi"
         tools:layout="@layout/fragment_root"/>
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.unh.anyscanner_rajat_rohith_f23.ProfileFragment"
-        android:label="wifi_fragment"
-        tools:layout="@layout/fragment_profile"/>
+        android:label="wifi"
+        tools:layout="@layout/fragment_profile">
+        <action
+            android:id="@+id/action_profileFragment_to_rootFragment"
+            app:destination="@id/rootFragment" />
+    </fragment>
 
 </navigation>

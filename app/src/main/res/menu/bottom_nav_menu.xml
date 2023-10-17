@@ -5,15 +5,19 @@
     <item
         android:id="@+id/qrFragment"
         android:icon="@drawable/ic_launcher_background"
-        android:title="QR"/>
+        android:title="QR"
+        android:enabled="true"
+        />
     <item
         android:id="@+id/wifiFragment"
         android:icon="@drawable/ic_launcher_background"
-        android:title="WiFi"/>
+        android:title="WiFi"
+        android:enabled="true"/>
     <item
         android:id="@+id/rootFragment"
         android:icon="@drawable/ic_launcher_background"
-        android:title="Root"/>
+        android:title="Root"
+        android:enabled="true"/>
     <item
         android:id="@+id/profileFragment"
         android:icon="@drawable/ic_launcher_background"
