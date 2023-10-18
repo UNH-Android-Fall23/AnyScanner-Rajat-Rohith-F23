@@ -63,6 +63,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth:20.7.0")
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation ("com.google.firebase:firebase-firestore-ktx:24.8.1")
+    //third party lib for camera based on ZXing
     implementation("com.github.yuriy-budiyev:code-scanner:2.3.2")
     implementation("androidx.navigation:navigation-ui-ktx:2.2.0")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")

@@ -41,10 +41,6 @@ class AnyScannerActivity : AppCompatActivity() {
                 else -> resources.getString(R.string.app_name)
             }
 
-            // val navController =  findNavController(R.id.activity_main_nav_host)
-
-            //actionBar?.title = "Name"
-
             val appBarConfiguration = AppBarConfiguration(
                 setOf(
                     R.id.qrFragment, R.id.wifiFragment, R.id.rootFragment, R.id.profileFragment
