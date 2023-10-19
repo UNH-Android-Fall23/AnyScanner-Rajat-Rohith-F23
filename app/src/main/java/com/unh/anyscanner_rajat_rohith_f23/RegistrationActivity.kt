@@ -38,16 +38,16 @@ class RegistrationActivity : AppCompatActivity() {
             if(fname.text.toString()==""){
                 binding.firstNameEt.error="Field Required"
             }
-            else if(lname.text.toString()==""){
+            if(lname.text.toString()==""){
                 binding.lastNameEt.error="Field Required"
             }
-            else if(email.text.toString()==""){
+            if(email.text.toString()==""){
                 binding.emailEt.error="Field Required"
             }
-            else if(password.text.toString()==""){
+            if(password.text.toString()==""){
                 binding.passwordEt.error="Field Required"
             }
-            else if(Repass.text.toString()==""){
+            if(Repass.text.toString()==""){
                 binding.repeatPasswordEt.error="Field Required"
             }
             else if(!isValidEmail(email.text.toString())){
@@ -62,12 +62,6 @@ class RegistrationActivity : AppCompatActivity() {
             else {
                 registerUser(binding.firstNameEt.text.toString(),binding.lastNameEt.text.toString(),email.text.toString(), password.text.toString())
             }
-        }
-
-        binding.backBtn.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-            finish()
         }
 
     }
