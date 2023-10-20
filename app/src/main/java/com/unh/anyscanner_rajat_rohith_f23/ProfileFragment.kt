@@ -15,7 +15,6 @@ import com.unh.anyscanner_rajat_rohith_f23.databinding.FragmentProfileBinding
 class ProfileFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
-    private lateinit var googleSignInClient: GoogleSignInClient
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -28,7 +27,6 @@ class ProfileFragment : Fragment() {
 
         binding.button8.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
-            googleSignInClient.signOut()
             goToLoginActivity(view = null)
         }
 
