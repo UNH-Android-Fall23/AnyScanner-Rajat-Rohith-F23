@@ -3,6 +3,7 @@ package com.unh.anyscanner_rajat_rohith_f23
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.util.Patterns
 import android.view.View
 import android.widget.Toast
@@ -27,6 +28,7 @@ import androidx.fragment.app.FragmentActivity
 class MainActivity : AppCompatActivity() {
     private lateinit var fbaseAuth: FirebaseAuth
     private lateinit var binding: ActivityMainBinding
+    private val TAG= "AnyScannerTag"
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var launcher: ActivityResultLauncher<Intent>
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,6 +88,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 binding.loginBtn.setOnClickListener {
+                    /*
                     var passwordMatched = false
                     val username = binding.editTextTextEmailAddress2
                     val password = binding.editTextTextPassword
@@ -146,6 +149,9 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
                     }
+                    */
+                    goToqrActivity(view = null)
+                    Log.d(TAG,"Anyscanner opened")
                 }
         launcher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
