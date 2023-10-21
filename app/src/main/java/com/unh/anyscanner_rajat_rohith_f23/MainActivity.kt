@@ -155,7 +155,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
     }
-
+    override fun onBackPressed() {
+    }
         fun goToqrActivity(view: View?) {
             val intent = Intent(this, AnyScannerActivity::class.java)
             startActivity(intent)
