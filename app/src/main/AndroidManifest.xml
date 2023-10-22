@@ -37,29 +37,33 @@
         android:theme="@style/Theme.AnyScannerRajatRohithF23"
         tools:targetApi="33">
         <activity
+            android:name=".Change_Details_Account"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".Account_Information"
-            android:screenOrientation="portrait"
-            android:exported="true" />
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".PasswordChange"
-            android:screenOrientation="portrait"
-            android:exported="true" />
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Forgot_Password_Verfifcation"
-            android:screenOrientation="portrait"
-            android:exported="true" />
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".AnyScannerActivity"
-            android:screenOrientation="portrait"
-            android:exported="true" />
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".RegistrationActivity"
-            android:screenOrientation="portrait"
-            android:exported="true" />
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="portrait"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
