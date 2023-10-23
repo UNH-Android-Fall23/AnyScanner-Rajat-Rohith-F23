@@ -3,6 +3,7 @@ package com.unh.anyscanner_rajat_rohith_f23
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
 import android.text.TextUtils
 import android.util.Log
 import android.util.Patterns
@@ -55,10 +56,12 @@ class Change_Details_Account : AppCompatActivity() {
                     for (document in querySnapshot) {
                         docId = document.id
                         userData = document.data
+                        binding.firstNameEt.setText(userData["FirstName"].toString())
+                        binding.lastNameEt.setText(userData["LastName"].toString())
                     }
                 }
             }
-
+        binding.emailEt.setText(Mainemail)
         binding.registerBtn.setOnClickListener {
             val fname = binding.firstNameEt.text.toString()
             val lname = binding.lastNameEt.text.toString()
@@ -77,13 +80,18 @@ class Change_Details_Account : AppCompatActivity() {
             } else {
                 checkEmailExistsOrNot(email) { emailExists ->
                     if (emailExists) {
-                        docId?.let { it1 ->
-                            db.collection("users").document(it1).update("FirstName", fname)
+                        if(Mainemail==email) {
+                            docId?.let { it1 ->
+                                db.collection("users").document(it1).update("FirstName", fname)
+                            }
+                            docId?.let { it1 ->
+                                db.collection("users").document(it1).update("LastName", lname)
+                            }
+                            goToAIActivity(view = null)
                         }
-                        docId?.let { it1 ->
-                            db.collection("users").document(it1).update("LastName", lname)
+                        else{
+                            binding.emailEt.error = "Email already signed up"
                         }
-                        goToAIActivity(view = null)
                     } else {
                         docId?.let { it1 ->
                             db.collection("users").document(it1).update("FirstName", fname)
