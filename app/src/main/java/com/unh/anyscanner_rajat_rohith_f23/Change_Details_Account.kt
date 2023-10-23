@@ -77,7 +77,13 @@ class Change_Details_Account : AppCompatActivity() {
             } else {
                 checkEmailExistsOrNot(email) { emailExists ->
                     if (emailExists) {
-                        binding.emailEt.error = "Email already signed up"
+                        docId?.let { it1 ->
+                            db.collection("users").document(it1).update("FirstName", fname)
+                        }
+                        docId?.let { it1 ->
+                            db.collection("users").document(it1).update("LastName", lname)
+                        }
+                        goToAIActivity(view = null)
                     } else {
                         docId?.let { it1 ->
                             db.collection("users").document(it1).update("FirstName", fname)
@@ -112,13 +118,14 @@ class Change_Details_Account : AppCompatActivity() {
                     callback(false)
                 }
             }
-            .addOnFailureListener { e ->
+            .addOnFailureListener {
                 callback(false)
             }
     }
     fun goToAIActivity(view: View?) {
         val intent = Intent(this, Account_Information::class.java)
         startActivity(intent)
+        finish()
     }
 
     fun isValidEmail(target: CharSequence?): Boolean {

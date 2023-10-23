@@ -93,9 +93,11 @@ class Account_Information : AppCompatActivity() {
     fun goToFPActivity(view: View?) {
         val intent = Intent(this, Forgot_Password_Verfifcation::class.java)
         startActivity(intent)
+        finish()
     }
     fun goToCDActivity(view: View?) {
         val intent = Intent(this, Change_Details_Account::class.java)
         startActivity(intent)
+        finish()
     }
 }
