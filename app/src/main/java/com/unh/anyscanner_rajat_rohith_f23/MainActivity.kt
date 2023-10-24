@@ -21,14 +21,21 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.unh.anyscanner_rajat_rohith_f23.databinding.ActivityMainBinding
 import androidx.biometric.BiometricPrompt
-import androidx.fragment.app.FragmentActivity
 
+interface BiometricCallback {
+    fun onBiometricValueReceived(biometricValue: Boolean)
+}
 
 class MainActivity : AppCompatActivity() {
     private lateinit var fbaseAuth: FirebaseAuth
     private lateinit var binding: ActivityMainBinding
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var launcher: ActivityResultLauncher<Intent>
+    private var email: String? = null
+    private var b : Boolean = false
+    private val db = FirebaseFirestore.getInstance()
+    private val user = Firebase.auth.currentUser
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -37,6 +44,9 @@ class MainActivity : AppCompatActivity() {
         setContentView((binding.root))
 
         fbaseAuth = Firebase.auth
+        user?.let {
+            email = it.email
+        }
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id))
@@ -48,7 +58,7 @@ class MainActivity : AppCompatActivity() {
         val biometricPromptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle("Biometric Login")
             .setSubtitle("Authenticate using your fingerprint")
-            .setDescription("Touch the fingerprint sensor to log in to AnyScanner")
+            .setDescription("Touch the fingerprint sensor to log with user $email")
             .setNegativeButtonText("Cancel")
             .build()
 
@@ -70,83 +80,88 @@ class MainActivity : AppCompatActivity() {
         })
 
         binding.materialTextView2.setOnClickListener {
-            biometricPrompt.authenticate(biometricPromptInfo)
+            if (email != null && b) {
+                biometricPrompt.authenticate(biometricPromptInfo)
+            }
+            else{
+                Toast.makeText(this, "First Login Needed", Toast.LENGTH_SHORT).show()
+            }
         }
 
         binding.google.setOnClickListener {
             signInWithGoogle()
         }
 
-                binding.registerText.setOnClickListener {
-                    goToREActivity(view = null)
-                }
+        binding.registerText.setOnClickListener {
+            goToREActivity(view = null)
+        }
 
-                binding.materialTextView.setOnClickListener {
-                    goToFPActivity(view = null)
-                }
+        binding.materialTextView.setOnClickListener {
+            goToFPActivity(view = null)
+        }
 
-                binding.loginBtn.setOnClickListener {
-                    var passwordMatched = false
-                    val username = binding.editTextTextEmailAddress2
-                    val password = binding.editTextTextPassword
-                    if (username.text.toString() == "") {
-                        binding.editTextTextEmailAddress2.error = "Field Required"
-                    }
-                    if (password.text.toString() == "") {
-                        binding.editTextTextPassword.error = "Field Required"
-                    }
-                    if (!isValidEmail(username.text.toString())) {
-                        binding.editTextTextEmailAddress2.error = "Enter a valid email"
+        binding.loginBtn.setOnClickListener {
+            var passwordMatched = false
+            val username = binding.editTextTextEmailAddress2
+            val password = binding.editTextTextPassword
+            if (username.text.toString() == "") {
+                binding.editTextTextEmailAddress2.error = "Field Required"
+            }
+            if (password.text.toString() == "") {
+                binding.editTextTextPassword.error = "Field Required"
+            }
+            if (!isValidEmail(username.text.toString())) {
+                binding.editTextTextEmailAddress2.error = "Enter a valid email"
+            } else {
+                val query = FirebaseFirestore.getInstance().collection("users")
+                    .whereEqualTo("Email", username.text.toString()).get()
+                query.addOnSuccessListener { documents ->
+                    if (documents.isEmpty) {
+                        binding.editTextTextEmailAddress2.error = "This Email needs sign up"
                     } else {
-                        val query = FirebaseFirestore.getInstance().collection("users")
-                            .whereEqualTo("Email", username.text.toString()).get()
-                        query.addOnSuccessListener { documents ->
-                            if (documents.isEmpty) {
-                                binding.editTextTextEmailAddress2.error = "This Email needs sign up"
-                            } else {
-                                for (document in documents) {
-                                    val userData = document.data
-                                    if (userData["Password"] != password.text.toString()) {
-                                        binding.editTextTextPassword.error =
-                                            "Password does not match"
-                                    }
-                                    if (userData["Password"] == password.text.toString()) {
-                                        passwordMatched = true
-                                    }
-                                }
+                        for (document in documents) {
+                            val userData = document.data
+                            if (userData["Password"] != password.text.toString()) {
+                                binding.editTextTextPassword.error =
+                                    "Password does not match"
                             }
-                            if (passwordMatched) {
-                                fbaseAuth.signInWithEmailAndPassword(
-                                    username.text.toString(),
-                                    password.text.toString()
-                                )
-                                    .addOnCompleteListener(this) { task ->
-                                        if (task.isSuccessful) {
-                                            val user = fbaseAuth.currentUser
-                                            if (user != null) {
-                                                goToqrActivity(view = null)
-                                            }
-                                        } else {
-                                            when ((task.exception as FirebaseAuthException?)!!.errorCode) {
-                                                "ERROR_INVALID_EMAIL" -> binding.editTextTextEmailAddress2.error =
-                                                    "INVALID EMAIL"
-
-                                                "ERROR_WRONG_PASSWORD" -> binding.editTextTextPassword.error =
-                                                    "INVALID PASSWORD"
-
-                                                else -> {
-                                                    binding.editTextTextEmailAddress2.error =
-                                                        "INVALID EMAIL"
-                                                    binding.editTextTextPassword.error =
-                                                        "INVALID PASSWORD"
-                                                }
-                                            }
-                                        }
-                                    }
+                            if (userData["Password"] == password.text.toString()) {
+                                passwordMatched = true
                             }
                         }
                     }
+                    if (passwordMatched) {
+                        fbaseAuth.signInWithEmailAndPassword(
+                            username.text.toString(),
+                            password.text.toString()
+                        )
+                            .addOnCompleteListener(this) { task ->
+                                if (task.isSuccessful) {
+                                    val user = fbaseAuth.currentUser
+                                    if (user != null) {
+                                        goToqrActivity(view = null)
+                                    }
+                                } else {
+                                    when ((task.exception as FirebaseAuthException?)!!.errorCode) {
+                                        "ERROR_INVALID_EMAIL" -> binding.editTextTextEmailAddress2.error =
+                                            "INVALID EMAIL"
+
+                                        "ERROR_WRONG_PASSWORD" -> binding.editTextTextPassword.error =
+                                            "INVALID PASSWORD"
+
+                                        else -> {
+                                            binding.editTextTextEmailAddress2.error =
+                                                "INVALID EMAIL"
+                                            binding.editTextTextPassword.error =
+                                                "INVALID PASSWORD"
+                                        }
+                                    }
+                                }
+                            }
+                    }
                 }
+            }
+        }
         launcher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
@@ -157,34 +172,59 @@ class MainActivity : AppCompatActivity() {
     }
     override fun onBackPressed() {
     }
-        fun goToqrActivity(view: View?) {
-            val intent = Intent(this, AnyScannerActivity::class.java)
-            startActivity(intent)
-            finish()
-        }
+    fun goToqrActivity(view: View?) {
+        val intent = Intent(this, AnyScannerActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
 
-        fun goToREActivity(view: View?) {
-            val intent = Intent(this, RegistrationActivity::class.java)
-            startActivity(intent)
-        }
+    fun goToREActivity(view: View?) {
+        val intent = Intent(this, RegistrationActivity::class.java)
+        startActivity(intent)
+    }
 
-        fun goToFPActivity(view: View?) {
-            val intent = Intent(this, Forgot_Password_Verfifcation::class.java)
-            startActivity(intent)
-        }
+    fun goToFPActivity(view: View?) {
+        val intent = Intent(this, Forgot_Password_Verfifcation::class.java)
+        startActivity(intent)
+    }
 
-        fun isValidEmail(target: CharSequence?): Boolean {
-            return !TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches()
-        }
+    fun isValidEmail(target: CharSequence?): Boolean {
+        return !TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches()
+    }
 
     public override fun onStart() {
         super.onStart()
-        val currentUser = fbaseAuth.currentUser
-        if (currentUser != null) {
-            goToqrActivity(view = null)
+
+        fetchBiometricValue(object : BiometricCallback {
+            override fun onBiometricValueReceived(biometricValue: Boolean) {
+                b = biometricValue
+                if (email != null && !b) {
+                    goToqrActivity(view = null)
+                }
+                if(email!=null && b){
+                    binding.materialTextView2.performClick()
+                }
+            }
+        })
+    }
+    private fun fetchBiometricValue(callback: BiometricCallback) {
+        if (email != null) {
+            val collectionReference = db.collection("UserProfile")
+            val documentReference = collectionReference.document(user?.uid ?: "")
+            documentReference.get()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val documentSnapshot = task.result
+
+                        if (documentSnapshot != null && documentSnapshot.exists()) {
+                            val data = documentSnapshot.data
+                            val b = (data?.get("biometric") ?: false) as Boolean
+                            callback.onBiometricValueReceived(b)
+                        }
+                    }
+                }
         }
     }
-
 
     private fun signInWithGoogle() {
         val signInIntent = googleSignInClient.signInIntent
@@ -212,4 +252,3 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
-
