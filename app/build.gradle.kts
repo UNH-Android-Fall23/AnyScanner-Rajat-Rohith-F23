@@ -70,7 +70,7 @@ dependencies {
     implementation ("com.sun.mail:android-mail:1.6.7")
     implementation ("com.sun.mail:android-activation:1.6.7")
     implementation ("androidx.biometric:biometric:1.1.0")
-    implementation ("com.google.android.gms:play-services-safetynet:18.0.1")
-
+    implementation ("com.squareup.okhttp3:okhttp:4.9.1")
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.9.1")
 }
 

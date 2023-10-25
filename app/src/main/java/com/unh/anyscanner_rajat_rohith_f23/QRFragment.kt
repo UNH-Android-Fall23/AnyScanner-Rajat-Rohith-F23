@@ -1,35 +1,30 @@
 package com.unh.anyscanner_rajat_rohith_f23
 
 import android.app.AlertDialog
-import android.nfc.Tag
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.PopupMenu
-import android.widget.PopupWindow
 import android.widget.Toast
 import com.budiyev.android.codescanner.CodeScanner
 import com.budiyev.android.codescanner.CodeScannerView
 import com.budiyev.android.codescanner.DecodeCallback
-import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.GoogleApiAvailability
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.CommonStatusCodes
-import com.google.android.gms.safetynet.SafeBrowsingThreat
-import com.google.android.gms.safetynet.SafetyNet
-import com.google.android.gms.tasks.OnSuccessListener
-import com.google.android.gms.tasks.Tasks
-import com.google.android.material.tabs.TabLayout.TabGravity
-import java.security.SecureRandom
+import java.io.IOException
+import java.nio.charset.StandardCharsets
+import java.util.Base64
+import okhttp3.*
+import org.json.JSONObject
+
 
 
 class QRFragment : Fragment() {
     private lateinit var codeScanner: CodeScanner
-    private lateinit var scanVal: String
+    private var scanVal: String = ""
     private val TAG="AnyScannerF23"
+    private val apiKey = "408ac8b1b8565046b21e57b71c2ddb72e10bf0e23745cc21fc8cc68a5ef65292"
+    private val client = OkHttpClient()
 
 
 
@@ -39,58 +34,52 @@ class QRFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_q_r, container, false)
     }
 
-    private fun showQRResults(){
+    private fun showQRResults(message: String){
         val alertDialog: AlertDialog.Builder=AlertDialog.Builder(context)
         //TODO design custom layout
-        alertDialog.setTitle("Depends on Threat type")
-        alertDialog.setMessage(scanVal)
+        alertDialog.setTitle(scanVal)
+        alertDialog.setMessage(message)
         val dialog: AlertDialog = alertDialog.create()
         dialog.show()
     }
 
-    private fun checkURL(){
-        //crashes on using safebrowsing as we dont have to initialize it we are just testing
-        //Tasks.await(SafetyNet.getClient(requireContext()).initSafeBrowsing())
+    private fun checkURL(analysisId: String){
+        val request = Request.Builder()
+            .url("https://www.virustotal.com/api/v3/urls/$analysisId")
+            .get()
+            .addHeader("x-apikey", apiKey)
+            .build()
 
-
-        SafetyNet.getClient(requireActivity()).lookupUri(
-            "https:wicar.org",
-            "AIzaSyBOs9JmoasE81MHrNIDymU9w2IwyvnvnIA",
-            SafeBrowsingThreat.TYPE_POTENTIALLY_HARMFUL_APPLICATION,
-            SafeBrowsingThreat.TYPE_SOCIAL_ENGINEERING
-        )
-            .addOnSuccessListener(requireActivity()) { sbResponse ->
-                // Indicates communication with the service was successful.
-                // Identify any detected threats.
-                Log.d(TAG,"Hurray")
-
-                if (sbResponse.detectedThreats.isEmpty()) {
-                    // No threats found.
-                    //TODO return to display safe url
-                    Log.d(TAG,"Threats found are ${sbResponse.detectedThreats}")
-                } else {
-                    // Threats found!
-                    Log.d(TAG,"Threats found are ${sbResponse.detectedThreats}")
-                }
-            }
-            .addOnFailureListener(requireActivity()) { e: Exception ->
-                if (e is ApiException) {
-                    // An error with the Google Play Services API contains some
-                    // additional details.
-                    Log.d(TAG, "Error: ${CommonStatusCodes.getStatusCodeString(e.statusCode)}")
-
-                    // Note: If the status code, s.statusCode,
-                    // is SafetyNetStatusCode.SAFE_BROWSING_API_NOT_INITIALIZED,
-                    // you need to call initSafeBrowsing(). It means either you
-                    // haven't called initSafeBrowsing() before or that it needs
-                    // to be called again due to an internal error.
-                } else {
-                    // A different, unknown type of error occurred.
-                    Log.d(TAG, "Error: ${e.message}")
-                }
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                // Handle request failure
+                e.printStackTrace()
             }
 
-            
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    val responseBody = response.body?.string()
+                    // Parse and process the URL analysis report as needed
+                    val data = JSONObject(responseBody)
+                    // Extract "harmless" and "malicious" values
+                    val totalVotes = data.getJSONObject("data")
+                        .getJSONObject("attributes")
+                        .getJSONObject("total_votes")
+                    val harmlessCount = totalVotes.getInt("harmless")
+                    val maliciousCount = totalVotes.getInt("malicious")
+                    if(harmlessCount>maliciousCount){
+                        scanVal="Harmless"
+                    }else if(maliciousCount>harmlessCount){
+                        scanVal="Malicious"
+                    }
+                    Log.d(TAG, "Harmless and mal counts are $harmlessCount and $maliciousCount")
+                } else {
+                    Log.e(TAG, "Request failed with code: ${response.code}")
+                    scanVal="Error"
+                }
+            }
+        })
+
         /**/
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -98,13 +87,14 @@ class QRFragment : Fragment() {
         val activity = requireActivity()
         codeScanner = CodeScanner(activity, scannerView)
         codeScanner.camera=CodeScanner.CAMERA_BACK
-        checkURL()
         codeScanner.decodeCallback = DecodeCallback {
             activity.runOnUiThread {
-                scanVal=it.text.toString()
-                Toast.makeText(activity, scanVal, Toast.LENGTH_LONG).show()
-
-                showQRResults()
+                val url = it.text.toString()
+                val urlId = Base64.getUrlEncoder().withoutPadding().encodeToString(url.toByteArray(
+                    StandardCharsets.UTF_8))
+                checkURL(urlId)
+                Toast.makeText(activity, url, Toast.LENGTH_LONG).show()
+                showQRResults(url)
             }
         }
         scannerView.setOnClickListener {
