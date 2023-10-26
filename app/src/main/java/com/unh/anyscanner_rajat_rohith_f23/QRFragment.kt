@@ -106,8 +106,7 @@ class QRFragment : Fragment() {
                     urlScanned=attributes.getString("url")
                     Log.d(TAG,"Report attributes ${data.getJSONObject("data").toString()}")
                     if (attributes.has("crowdsourced_context")) {
-                        val crowdsourcedContextArray =
-                            attributes.getJSONArray("crowdsourced_context")
+                        val crowdsourcedContextArray = attributes.getJSONArray("crowdsourced_context")
                             Log.d(TAG,"crowd is ${crowdsourcedContextArray.toString()}")
 
                         if (crowdsourcedContextArray.length() > 0) {
