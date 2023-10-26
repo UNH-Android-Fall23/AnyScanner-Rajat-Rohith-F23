@@ -105,7 +105,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.loginBtn.setOnClickListener {
-            var passwordMatched = false
+            /* var passwordMatched = false
             val username = binding.editTextTextEmailAddress2
             val password = binding.editTextTextPassword
             if (username.text.toString() == "") {
@@ -173,8 +173,15 @@ class MainActivity : AppCompatActivity() {
                     handleSignInResult(data)
                 }
             }
+
+             */
+            goToqrActivity(it)
+            Log.d(TAG,"Anyscanner opened")
+
     }
-    override fun onBackPressed() {
+    fun onBackPressed() {
+
+    }
     }
     fun goToqrActivity(view: View?) {
         val intent = Intent(this, AnyScannerActivity::class.java)

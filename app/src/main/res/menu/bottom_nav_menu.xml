@@ -4,23 +4,23 @@
 
     <item
         android:id="@+id/qrFragment"
-        android:icon="@drawable/ic_launcher_background"
+        android:icon="@drawable/nav_qr_icon_foreground"
         android:title="QR"
         android:enabled="true"
         />
     <item
         android:id="@+id/wifiFragment"
-        android:icon="@drawable/ic_launcher_background"
+        android:icon="@drawable/nav_wifi_icon_foreground"
         android:title="WiFi"
         android:enabled="true"/>
     <item
         android:id="@+id/rootFragment"
-        android:icon="@drawable/ic_launcher_background"
+        android:icon="@drawable/nav_root_icon_foreground"
         android:title="Root"
         android:enabled="true"/>
     <item
         android:id="@+id/profileFragment"
-        android:icon="@drawable/ic_launcher_background"
+        android:icon="@drawable/nav_profile_icon_foreground"
         android:title="Profile"/>
 
 </menu>
