@@ -1,6 +1,7 @@
 package com.unh.anyscanner_rajat_rohith_f23
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -22,7 +23,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.unh.anyscanner_rajat_rohith_f23.databinding.ActivityMainBinding
 import androidx.biometric.BiometricPrompt
-import androidx.fragment.app.FragmentActivity
 
 
 class MainActivity : AppCompatActivity() {
@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     private val TAG= "AnyScannerTag"
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var launcher: ActivityResultLauncher<Intent>
+    //private var key: String = BuildConfig.default_web_client_id
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

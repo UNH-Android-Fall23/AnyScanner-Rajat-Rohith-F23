@@ -22,12 +22,13 @@ android {
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
-
+        //buildConfigField("String","default_web_client_id","default_web_client_id")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     //googles method of variable binding - links kt to xml
     buildFeatures{
         viewBinding=true
+        buildConfig=true
     }
 
     buildTypes {
