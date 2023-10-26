@@ -28,13 +28,13 @@ class Forgot_Password_Verfifcation : AppCompatActivity() {
         lateinit var i: String
         val rnd = Random()
         val number: Int = rnd.nextInt(999999)
-        i=number.toString()
+        i = number.toString()
         lateinit var email: String
 
         binding.button.setOnClickListener {
             email = binding.editTextTextEmailAddress.text.toString()
-            if(email==""){
-                binding.editTextTextEmailAddress.error="Field Required"
+            if (email == "") {
+                binding.editTextTextEmailAddress.error = "Field Required"
             }
             if (!isValidEmail(email)) {
                 binding.editTextTextEmailAddress.error = "Enter a valid email"
@@ -45,23 +45,19 @@ class Forgot_Password_Verfifcation : AppCompatActivity() {
                     if (documents.isEmpty) {
                         binding.editTextTextEmailAddress.error = "This Email needs sign up"
                     } else {
-                        sendEmail(email,i)
+                        sendEmail(email, i)
                     }
                 }
             }
         }
-        binding.button2.setOnClickListener{
-            val j=binding.editTextNumber.text.toString()
-            if(j==i){
-                goToPCActivity(view = null,email)
+        binding.button2.setOnClickListener {
+            val j = binding.editTextNumber.text.toString()
+            if (j == i) {
+                goToPCActivity(view = null, email)
+            } else {
+                binding.editTextNumber.error = "Code Does not match"
             }
-            else{
-                binding.editTextNumber.error="Code Does not match"
-            }
-        }
-
-    }
-
+        } }
 
     private fun goToPCActivity(view: Nothing?,email: String) {
         val intent = Intent(this, PasswordChange::class.java)

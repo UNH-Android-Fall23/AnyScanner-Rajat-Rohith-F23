@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.unh.anyscanner_rajat_rohith_f23">
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <uses-feature android:name="android.hardware.fingerprint" android:required="false" />
     <uses-feature android:name="android.hardware.face" android:required="false" />
@@ -11,6 +13,15 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE " />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-feature
+        android:name="android.hardware.fingerprint"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.face"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true"/>
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -26,20 +37,33 @@
         android:theme="@style/Theme.AnyScannerRajatRohithF23"
         tools:targetApi="33">
         <activity
+            android:name=".Change_Details_Account"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Account_Information"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".PasswordChange"
-            android:exported="true" />
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Forgot_Password_Verfifcation"
-            android:exported="true" />
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".AnyScannerActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".RegistrationActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
