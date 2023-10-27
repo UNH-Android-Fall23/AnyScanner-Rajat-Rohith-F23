@@ -107,8 +107,7 @@ class QRFragment : Fragment() {
                     Log.d(TAG,"Report attributes ${data.getJSONObject("data").toString()}")
                     if (attributes.has("crowdsourced_context")) {
                         val crowdsourcedContextArray = attributes.getJSONArray("crowdsourced_context")
-                            Log.d(TAG,"crowd is ${crowdsourcedContextArray.toString()}")
-
+                        Log.d(TAG,"crowd is ${crowdsourcedContextArray.toString()}")
                         if (crowdsourcedContextArray.length() > 0) {
                             val firstContextObject = crowdsourcedContextArray.getJSONObject(0)
                             Log.d(TAG,"crowd obj is ${firstContextObject.toString()}")
@@ -173,7 +172,6 @@ class QRFragment : Fragment() {
 
     private val activityResultLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-
             permissions.entries.forEach {
                 val permissionName = it.key
                 val isGranted = it.value
