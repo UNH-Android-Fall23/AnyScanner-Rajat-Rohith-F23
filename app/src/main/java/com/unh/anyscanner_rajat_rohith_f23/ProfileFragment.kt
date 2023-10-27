@@ -6,11 +6,14 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
+import java.util.Random
+import java.util.Calendar
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +23,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -31,8 +35,8 @@ class ProfileFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
 
-    private val notificationChannelId = "notification_channel_id"
     private val notificationId = 1
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -91,10 +95,9 @@ class ProfileFragment : Fragment() {
             db.collection("UserProfile")
                 .document(user?.uid ?: "")
                 .set(userProfile)
-            if (isChecked) {
+            if (n) {
                 if (checkPermission()) {
-                    createNotificationChannel()
-                    showNotification()
+                    scheduleRandomNotification()
                 } else {
                     binding.switch3.isChecked = false
                     Toast.makeText(
@@ -137,42 +140,6 @@ class ProfileFragment : Fragment() {
         )
     }
 
-    private fun createNotificationChannel() {
-        val name = "Checking For root"
-        val descriptionText = "If found any shown in notifications"
-        val importance = NotificationManager.IMPORTANCE_DEFAULT
-        val channel = NotificationChannel(notificationChannelId, name, importance).apply {
-            description = descriptionText
-        }
-        val notificationManager =
-            requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(channel)
-    }
-
-    private fun showNotification() {
-        val intent = Intent(context, MainActivity::class.java)
-        val pendingIntent =
-            PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        val builder = NotificationCompat.Builder(requireContext(), notificationChannelId)
-            .setSmallIcon(R.drawable.screenshot_2023_10_09_at_9_00_04_am)
-            .setContentTitle("Hello!")
-            .setContentText("Check your Device, It may be rooted")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-
-        with(NotificationManagerCompat.from(requireContext())) {
-            if (ActivityCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                return
-            }
-            notify(notificationId, builder.build())
-        }
-    }
-
     fun goToLoginActivity(view: View?) {
         val intent = Intent(requireContext(), MainActivity::class.java)
         startActivity(intent)
@@ -181,6 +148,84 @@ class ProfileFragment : Fragment() {
     fun goToAIActivity(view: View?) {
         val intent = Intent(requireContext(), Account_Information::class.java)
         startActivity(intent)
+    }
+
+    private fun scheduleRandomNotification() {
+        val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(requireContext(), NotificationReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            requireContext(),
+            notificationId,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
+        val random = Random()
+        val randomHours = random.nextInt(24)
+        val randomMinutes = random.nextInt(60)
+
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.HOUR_OF_DAY, randomHours)
+        calendar.add(Calendar.MINUTE, randomMinutes)
+
+        val receiver = NotificationReceiver()
+        receiver.assignProfileFragment(this)
+
+        alarmManager.set(
+            AlarmManager.RTC_WAKEUP,
+            calendar.timeInMillis,
+            pendingIntent
+        )
+    }
+    class NotificationReceiver : BroadcastReceiver() {
+        var profileFragment: ProfileFragment? = null
+        private val notificationChannelId = "notification_channel_id"
+        private val notificationId = 1
+
+        fun assignProfileFragment(fragment: ProfileFragment) {
+            profileFragment = fragment
+        }
+
+        override fun onReceive(context: Context, intent: Intent) {
+            Log.d("AlarmTest", "Alarm triggered!")
+            createNotificationChannel(context)
+            showNotification(context)
+        }
+        private fun createNotificationChannel(context: Context) {
+            Log.d("AlarmTest", "Alarm triggered!!")
+            val name = "Checking For root"
+            val descriptionText = "If found any, shown in notifications"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val notificationChannelId = "notification_channel_id" // Ensure this matches your channel ID
+            val channel = NotificationChannel(notificationChannelId, name, importance).apply {
+                description = descriptionText
+            }
+            val notificationManager =
+                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        private fun showNotification(context: Context) {
+            val intent = Intent(context, MainActivity::class.java)
+            val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+            val builder = NotificationCompat.Builder(context, notificationChannelId) // Ensure this matches your channel ID
+                .setSmallIcon(R.drawable.screenshot_2023_10_09_at_9_00_04_am)
+                .setContentTitle("Hello!")
+                .setContentText("Check your Device, It may be rooted")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+
+            with(NotificationManagerCompat.from(context)) {
+                if (ActivityCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.POST_NOTIFICATIONS
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    return
+                }
+                notify(notificationId, builder.build())
+            }
+        }
     }
 
 }
