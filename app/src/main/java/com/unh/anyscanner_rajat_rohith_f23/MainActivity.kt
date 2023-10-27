@@ -1,10 +1,8 @@
 package com.unh.anyscanner_rajat_rohith_f23
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import android.util.Patterns
 import android.view.View
 import android.widget.Toast
@@ -31,10 +29,8 @@ interface BiometricCallback {
 class MainActivity : AppCompatActivity() {
     private lateinit var fbaseAuth: FirebaseAuth
     private lateinit var binding: ActivityMainBinding
-    private val TAG= "AnyScannerTag"
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var launcher: ActivityResultLauncher<Intent>
-    //private var key: String = BuildConfig.default_web_client_id
     private var email: String? = null
     private var b : Boolean = false
     private val db = FirebaseFirestore.getInstance()
@@ -66,28 +62,29 @@ class MainActivity : AppCompatActivity() {
             .setNegativeButtonText("Cancel")
             .build()
 
-        val biometricPrompt = BiometricPrompt(this, mainExecutor, object : BiometricPrompt.AuthenticationCallback() {
-            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                super.onAuthenticationError(errorCode, errString)
-                Toast.makeText(applicationContext, errString, Toast.LENGTH_SHORT).show()
-            }
+        val biometricPrompt =
+            BiometricPrompt(this, mainExecutor, object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    super.onAuthenticationError(errorCode, errString)
+                    Toast.makeText(applicationContext, errString, Toast.LENGTH_SHORT).show()
+                }
 
-            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                super.onAuthenticationSucceeded(result)
-                goToqrActivity(view = null)
-            }
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                    super.onAuthenticationSucceeded(result)
+                    goToqrActivity(view = null)
+                }
 
-            override fun onAuthenticationFailed() {
-                super.onAuthenticationFailed()
-                Toast.makeText(applicationContext, "Biometric Login Failed", Toast.LENGTH_SHORT).show()
-            }
-        })
+                override fun onAuthenticationFailed() {
+                    super.onAuthenticationFailed()
+                    Toast.makeText(applicationContext, "Biometric Login Failed", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            })
 
         binding.materialTextView2.setOnClickListener {
             if (email != null && b) {
                 biometricPrompt.authenticate(biometricPromptInfo)
-            }
-            else{
+            } else {
                 Toast.makeText(this, "First Login Needed", Toast.LENGTH_SHORT).show()
             }
         }
@@ -105,7 +102,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.loginBtn.setOnClickListener {
-            /* var passwordMatched = false
+            var passwordMatched = false
             val username = binding.editTextTextEmailAddress2
             val password = binding.editTextTextPassword
             if (username.text.toString() == "") {
@@ -173,16 +170,13 @@ class MainActivity : AppCompatActivity() {
                     handleSignInResult(data)
                 }
             }
-
-             */
-            goToqrActivity(it)
-            Log.d(TAG,"Anyscanner opened")
-
     }
-    fun onBackPressed() {
+
+
+    override fun onBackPressed() {
 
     }
-    }
+
     fun goToqrActivity(view: View?) {
         val intent = Intent(this, AnyScannerActivity::class.java)
         startActivity(intent)
