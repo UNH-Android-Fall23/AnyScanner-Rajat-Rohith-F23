@@ -95,6 +95,7 @@ class ProfileFragment : Fragment() {
             db.collection("UserProfile")
                 .document(user?.uid ?: "")
                 .set(userProfile)
+
             if (n) {
                 if (checkPermission()) {
                     scheduleRandomNotification()
@@ -186,16 +187,14 @@ class ProfileFragment : Fragment() {
         }
 
         override fun onReceive(context: Context, intent: Intent) {
-            Log.d("AlarmTest", "Alarm triggered!")
             createNotificationChannel(context)
             showNotification(context)
         }
         private fun createNotificationChannel(context: Context) {
-            Log.d("AlarmTest", "Alarm triggered!!")
             val name = "Checking For root"
             val descriptionText = "If found any, shown in notifications"
             val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val notificationChannelId = "notification_channel_id" // Ensure this matches your channel ID
+            val notificationChannelId = "notification_channel_id"
             val channel = NotificationChannel(notificationChannelId, name, importance).apply {
                 description = descriptionText
             }
@@ -207,7 +206,7 @@ class ProfileFragment : Fragment() {
         private fun showNotification(context: Context) {
             val intent = Intent(context, MainActivity::class.java)
             val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-            val builder = NotificationCompat.Builder(context, notificationChannelId) // Ensure this matches your channel ID
+            val builder = NotificationCompat.Builder(context, notificationChannelId)
                 .setSmallIcon(R.drawable.screenshot_2023_10_09_at_9_00_04_am)
                 .setContentTitle("Hello!")
                 .setContentText("Check your Device, It may be rooted")
