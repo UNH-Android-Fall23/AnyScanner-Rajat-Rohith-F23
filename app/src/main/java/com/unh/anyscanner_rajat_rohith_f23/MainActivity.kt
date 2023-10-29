@@ -1,6 +1,8 @@
 package com.unh.anyscanner_rajat_rohith_f23
 
+import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Patterns
@@ -9,6 +11,7 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -22,9 +25,11 @@ import com.google.firebase.ktx.Firebase
 import com.unh.anyscanner_rajat_rohith_f23.databinding.ActivityMainBinding
 import androidx.biometric.BiometricPrompt
 
+
 interface BiometricCallback {
-    fun onBiometricValueReceived(biometricValue: Boolean)
+    fun onBiometricValueReceived(biometricValue: Boolean, notifValue: Boolean, darkValue: Boolean)
 }
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var fbaseAuth: FirebaseAuth
@@ -33,6 +38,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var launcher: ActivityResultLauncher<Intent>
     private var email: String? = null
     private var b : Boolean = false
+    private var n : Boolean = false
+    private var d : Boolean = false
     private val db = FirebaseFirestore.getInstance()
     private val user = Firebase.auth.currentUser
 
@@ -44,8 +51,12 @@ class MainActivity : AppCompatActivity() {
         setContentView((binding.root))
 
         fbaseAuth = Firebase.auth
+        val sharedPreferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
         user?.let {
             email = it.email
+            if(email==""){
+                email = sharedPreferences.getString("user_email", null)
+            }
         }
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -201,17 +212,40 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
 
         fetchBiometricValue(object : BiometricCallback {
-            override fun onBiometricValueReceived(biometricValue: Boolean) {
+            override fun onBiometricValueReceived(biometricValue: Boolean, notifValue: Boolean, darkValue: Boolean) {
                 b = biometricValue
+                n = notifValue
+                d = darkValue
                 if (email != null && !b) {
                     goToqrActivity(view = null)
                 }
-                if(email!=null && b){
+                if (email != null && b) {
                     binding.materialTextView2.performClick()
+                }
+                if(n){
+                    note()
+                }
+                if(d){
+                    AppCompatDelegate
+                        .setDefaultNightMode(
+                            AppCompatDelegate
+                                .MODE_NIGHT_YES);
+                }
+                if(!d){
+                    AppCompatDelegate
+                        .setDefaultNightMode(
+                            AppCompatDelegate
+                                .MODE_NIGHT_NO);
                 }
             }
         })
     }
+
+    private fun note() {
+        val context = this
+        ProfileFragment.scheduleRandomNotification(context)
+    }
+
     private fun fetchBiometricValue(callback: BiometricCallback) {
         if (email != null) {
             val collectionReference = db.collection("UserProfile")
@@ -224,12 +258,15 @@ class MainActivity : AppCompatActivity() {
                         if (documentSnapshot != null && documentSnapshot.exists()) {
                             val data = documentSnapshot.data
                             val b = (data?.get("biometric") ?: false) as Boolean
-                            callback.onBiometricValueReceived(b)
+                            val n = (data?.get("notifications") ?: false) as Boolean
+                            val d = (data?.get("darkMode") ?: false) as Boolean
+                            callback.onBiometricValueReceived(b, n, d)
                         }
                     }
                 }
         }
     }
+
 
     private fun signInWithGoogle() {
         val signInIntent = googleSignInClient.signInIntent
@@ -245,6 +282,10 @@ class MainActivity : AppCompatActivity() {
                     if (task.isSuccessful) {
                         val user = fbaseAuth.currentUser
                         if (user != null) {
+                            val sharedPreferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
+                            val editor = sharedPreferences.edit()
+                            editor.putString("user_email", account.email)
+                            editor.apply()
                             goToqrActivity(view = null)
                         }
                     }
@@ -257,4 +298,5 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
+
 
