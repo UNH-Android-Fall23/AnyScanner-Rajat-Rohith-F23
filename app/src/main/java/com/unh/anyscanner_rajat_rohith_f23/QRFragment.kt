@@ -32,12 +32,11 @@ class QRFragment : Fragment() {
     var scanVal: String = ""
     var risk: String= ""
     var urlScanned: String=" "
+
     private val TAG="AnyScannerF23"
     private val apiKey = "408ac8b1b8565046b21e57b71c2ddb72e10bf0e23745cc21fc8cc68a5ef65292"
     private val client = OkHttpClient()
     private val handler = Handler(Looper.getMainLooper())
-
-
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -63,15 +62,23 @@ class QRFragment : Fragment() {
             dialog.dismiss()
             }
         visitButton.setOnClickListener {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-
-            // Check if there's an app to handle the intent before starting the activity
+            Log.d(TAG,"url is $url")
+            var urlRefined = url
+            if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                urlRefined = "http://$url"
+                Log.d(TAG, "here")
+            }
+            Log.d(TAG,"url refined= $urlRefined")
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(urlRefined))
             if (intent.resolveActivity(requireActivity().packageManager) != null) {
-                requireActivity().startActivity(intent)
+                Log.d(TAG, "initiated")
+                startActivity(intent)
             } else {
                 // Handle the case where there's no app to handle the intent
                 Toast.makeText(context, "No app to handle this URL.", Toast.LENGTH_SHORT).show()
             }
+            // Check if there's an app to handle the intent before starting the activity
+
         }
         dialog.show()
     }
@@ -80,15 +87,17 @@ class QRFragment : Fragment() {
         val request = Request.Builder()
             .url("https://www.virustotal.com/api/v3/urls/$analysisId")
             .get()
+            .header("User-Agent", "VirusTotal")
+            .addHeader("accept", "application/json")
             .addHeader("x-apikey", apiKey)
             .build()
+
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 // Handle request failure
                 e.printStackTrace()
             }
-
             override fun onResponse(call: Call, response: Response) {
 
                 if (response.isSuccessful) {
@@ -96,6 +105,8 @@ class QRFragment : Fragment() {
                     // Parse and process the URL analysis report as needed
                     val data = JSONObject(responseBody)
                     // Extract "harmless" and "malicious" values
+                    Log.d(TAG,"Response data ${data.toString()}")
+
                     val attributes = data.getJSONObject("data")
                         .getJSONObject("attributes")
                     val harmlessCount = attributes.getJSONObject("total_votes").getInt("harmless")
@@ -107,24 +118,20 @@ class QRFragment : Fragment() {
                     Log.d(TAG,"Report attributes ${data.getJSONObject("data").toString()}")
                     if (attributes.has("crowdsourced_context")) {
                         val crowdsourcedContextArray = attributes.getJSONArray("crowdsourced_context")
-                        Log.d(TAG,"crowd is ${crowdsourcedContextArray.toString()}")
-                        if (crowdsourcedContextArray.length() > 0) {
-                            val firstContextObject = crowdsourcedContextArray.getJSONObject(0)
-                            Log.d(TAG,"crowd obj is ${firstContextObject.toString()}")
-                        }
+                        val firstContextObject = crowdsourcedContextArray.getJSONObject(0)
+                        Log.d(TAG,"crowd obj is ${firstContextObject.toString()}")
+                         risk=firstContextObject.getString("severity")
+                    }else{
+                         risk="Not Available"
                     }
-                    //val crowdsourcedcontext= attributes.getJSONArray("crowdsourced_context").getJSONObject(0)
-                   // val severity=crowdsourcedcontext.getString("severity")
-                    val severity="num"
-
-                    if(harmlessCount>maliciousCount || lastharmlessCount>lastmaliciousCount){
+                    Log.d(TAG, "Mal count $maliciousCount and lastmalicous count $lastmaliciousCount")
+                    if(maliciousCount<harmlessCount || lastmaliciousCount<2 ||risk=="low"){
                         scanVal="Harmless"
-                        risk=severity
-                    }else if(maliciousCount>harmlessCount || lastmaliciousCount>lastharmlessCount){
-                        scanVal="Malicious"
-                        risk=severity
                     }
-                    Log.d(TAG,"Scan and url $scanVal and $urlScanned")
+                    if(maliciousCount>harmlessCount || lastmaliciousCount >2 ||risk=="high"){
+                        scanVal="Malicious"
+                    }
+                    Log.d(TAG,"Scan and url are: $scanVal and $urlScanned")
                 } else {
                     Log.e(TAG, "Request failed with code: ${response.code}")
                     scanVal="Error"
@@ -133,7 +140,6 @@ class QRFragment : Fragment() {
                 }
             }
         })
-        Log.d(TAG,"Scan , severity and url outer $scanVal , $risk and $urlScanned")
         handler.postDelayed({
             showQRResults(scanVal,risk,urlScanned)
         },3500)
@@ -152,7 +158,6 @@ class QRFragment : Fragment() {
                 val urlId = Base64.getUrlEncoder().withoutPadding().encodeToString(url.toByteArray(
                     StandardCharsets.UTF_8))
                 checkURL(urlId)
-                Toast.makeText(activity, url, Toast.LENGTH_LONG).show()
             }
         }
         scannerView.setOnClickListener {
@@ -187,3 +192,5 @@ class QRFragment : Fragment() {
         }
 
 }
+
+
