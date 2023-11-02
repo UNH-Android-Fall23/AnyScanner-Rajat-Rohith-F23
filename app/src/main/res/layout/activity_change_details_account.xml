@@ -12,7 +12,7 @@
         android:layout_height="45dp"
         android:text="&lt;"
         android:textAlignment="center"
-        android:textColor="#070707"
+        android:textColor="#594D4D"
         android:textSize="34sp"
         android:textStyle="normal"
         app:layout_constraintBottom_toBottomOf="parent"

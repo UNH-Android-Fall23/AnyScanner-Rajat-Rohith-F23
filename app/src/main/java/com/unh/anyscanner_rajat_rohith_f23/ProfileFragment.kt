@@ -6,28 +6,27 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
-import java.util.Random
-import java.util.Calendar
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.unh.anyscanner_rajat_rohith_f23.databinding.FragmentProfileBinding
+import java.util.Calendar
+import java.util.Random
 
 
 class ProfileFragment : Fragment() {
@@ -86,6 +85,18 @@ class ProfileFragment : Fragment() {
             db.collection("UserProfile")
                 .document(user?.uid ?: "")
                 .set(userProfile)
+            if(d){
+                AppCompatDelegate
+                    .setDefaultNightMode(
+                        AppCompatDelegate
+                            .MODE_NIGHT_YES);
+            }
+            if(!d){
+                AppCompatDelegate
+                    .setDefaultNightMode(
+                        AppCompatDelegate
+                            .MODE_NIGHT_NO);
+            }
         }
 
         binding.switch3.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -98,7 +109,7 @@ class ProfileFragment : Fragment() {
 
             if (n) {
                 if (checkPermission()) {
-                    scheduleRandomNotification()
+                    context?.let { scheduleRandomNotification(it) }
                 } else {
                     binding.switch3.isChecked = false
                     Toast.makeText(
@@ -150,33 +161,33 @@ class ProfileFragment : Fragment() {
         val intent = Intent(requireContext(), Account_Information::class.java)
         startActivity(intent)
     }
+    companion object {
+        fun scheduleRandomNotification(context: Context) {
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            val intent = Intent(context, NotificationReceiver::class.java)
+            val pendingIntent = PendingIntent.getBroadcast(
+                context,
+                1,
+                intent,
+                PendingIntent.FLAG_IMMUTABLE
+            )
+            val random = Random()
+            val randomHours = random.nextInt(24)
+            val randomMinutes = random.nextInt(60)
 
-    private fun scheduleRandomNotification() {
-        val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(requireContext(), NotificationReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(
-            requireContext(),
-            notificationId,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE
-        )
-        val random = Random()
-        val randomHours = random.nextInt(24)
-        val randomMinutes = random.nextInt(60)
+            val calendar = Calendar.getInstance()
+            calendar.add(Calendar.HOUR_OF_DAY, randomHours)
+            calendar.add(Calendar.MINUTE, randomMinutes)
+            calendar.add(Calendar.SECOND, 0)
 
-        val calendar = Calendar.getInstance()
-        calendar.add(Calendar.HOUR_OF_DAY, randomHours)
-        calendar.add(Calendar.MINUTE, randomMinutes)
-
-        val receiver = NotificationReceiver()
-        receiver.assignProfileFragment(this)
-
-        alarmManager.set(
-            AlarmManager.RTC_WAKEUP,
-            calendar.timeInMillis,
-            pendingIntent
-        )
+            alarmManager.set(
+                AlarmManager.RTC_WAKEUP,
+                calendar.timeInMillis,
+                pendingIntent
+            )
+        }
     }
+
     class NotificationReceiver : BroadcastReceiver() {
         var profileFragment: ProfileFragment? = null
         private val notificationChannelId = "notification_channel_id"
