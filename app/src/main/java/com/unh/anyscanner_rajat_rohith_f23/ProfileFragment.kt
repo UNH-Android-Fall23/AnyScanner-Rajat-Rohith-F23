@@ -176,9 +176,9 @@ class ProfileFragment : Fragment() {
             val randomMinutes = random.nextInt(60)
 
             val calendar = Calendar.getInstance()
-            calendar.add(Calendar.HOUR_OF_DAY, randomHours)
-            calendar.add(Calendar.MINUTE, randomMinutes)
-            calendar.add(Calendar.SECOND, 0)
+            //calendar.add(Calendar.HOUR_OF_DAY, randomHours)
+            //calendar.add(Calendar.MINUTE, randomMinutes)
+            calendar.add(Calendar.SECOND, 1)
 
             alarmManager.set(
                 AlarmManager.RTC_WAKEUP,
