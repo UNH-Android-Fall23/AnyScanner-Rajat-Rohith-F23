@@ -16,18 +16,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.unh.anyscanner_rajat_rohith_f23.databinding.FragmentWiFiBinding
 
 class WiFiFragment : Fragment() {
 
     private lateinit var wifiManager: WifiManager
     private val TAG="AnyScannerF23"
-    private var wifiPermitted: Boolean = false
+    private var connectedSSID: String = ""
+    private var wifiScanResults: List<ScanResult> =listOf(
+        ScanResult().apply {
+            SSID = "SSID1"
+            capabilities = "Capabilities1"
+        }
+    )
 
     private var _binding: FragmentWiFiBinding? = null
 
@@ -47,6 +51,8 @@ class WiFiFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         _binding = FragmentWiFiBinding.inflate(inflater, container, false)
+        //TODO this might cause error add check
+        updateConnectedSSID()
         return binding.root
     }
 
@@ -58,21 +64,31 @@ class WiFiFragment : Fragment() {
         scanButton.setOnClickListener {
             scanWifi()
         }
-        val dataset = arrayOf("January", "February", "March")
-        val customAdapter = WIFIRecyclerAdapter(dataset,dataset)
+        val recyclerView= binding.wifiRecycler
+        val customAdapter = WIFIRecyclerAdapter(arrayOf(), arrayOf(),0)
+        recyclerView.adapter = customAdapter
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+    }
+    @SuppressLint("MissingPermission")
+    private fun scanSuccess() {
+        val filteredResults = wifiManager.scanResults
+            .filter { it.SSID.isNotEmpty() } // Filter out blank SSIDs
+            .distinctBy { it.SSID } // Remove duplicate SSIDs
+
+        wifiScanResults = filteredResults
+        Log.d(TAG, "result is ${wifiScanResults.toString()}")
+        updateConnectedSSID()
+
+        val ssids = wifiScanResults.map { it.SSID }.toTypedArray()
+        val capabilities = wifiScanResults.map { it.capabilities }.toTypedArray()
+        val connectedPosition = ssids.indexOf(connectedSSID)
+        val customAdapter = WIFIRecyclerAdapter(ssids, capabilities, connectedPosition)
+
 
         val recyclerView= binding.wifiRecycler
         recyclerView.adapter = customAdapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-
-
-
-
-    }
-    @SuppressLint("MissingPermission")
-    private fun scanSuccess() {
-        val results = wifiManager.scanResults
-        Log.d(TAG,"result is ${results.toString()}")
+        Log.d(TAG,"result is ${wifiScanResults.toString()}")
     }
 
     private fun scanFailure() {
@@ -134,6 +150,13 @@ class WiFiFragment : Fragment() {
                     arrayOf(Manifest.permission.CHANGE_WIFI_STATE), 1)
             }
         }
+    }
+
+    @SuppressLint("MissingPermission")
+    fun updateConnectedSSID() {
+        val wifiManager = requireContext().getSystemService(Context.WIFI_SERVICE) as WifiManager
+        val wifiInfo = wifiManager.connectionInfo
+        connectedSSID = wifiInfo.ssid.replace("\"", "")
     }
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
                                             grantResults: IntArray) {

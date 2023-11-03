@@ -147,10 +147,6 @@ class QRFragment : Fragment() {
         activityResultLauncher.launch(arrayOf(android.Manifest.permission.CAMERA))
         codeScanner = CodeScanner(activity, scannerView)
         codeScanner.camera=CodeScanner.CAMERA_BACK
-        val url = "https://www.google.com/"
-        val urlId = Base64.getUrlEncoder().withoutPadding().encodeToString(url.toByteArray(
-            StandardCharsets.UTF_8))
-        checkURL(urlId)
         codeScanner.decodeCallback = DecodeCallback {
             activity.runOnUiThread {
                 val url = it.text.toString()
