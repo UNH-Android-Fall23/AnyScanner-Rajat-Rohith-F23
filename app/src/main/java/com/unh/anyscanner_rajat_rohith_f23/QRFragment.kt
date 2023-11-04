@@ -19,6 +19,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import com.budiyev.android.codescanner.CodeScanner
 import com.budiyev.android.codescanner.CodeScannerView
 import com.budiyev.android.codescanner.DecodeCallback
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.util.Base64
@@ -32,6 +35,7 @@ class QRFragment : Fragment() {
     var scanVal: String = ""
     var risk: String= ""
     var urlScanned: String=" "
+    var isMalicious:Boolean=false
 
     private val TAG="AnyScannerF23"
     private val apiKey = "408ac8b1b8565046b21e57b71c2ddb72e10bf0e23745cc21fc8cc68a5ef65292"
@@ -44,7 +48,7 @@ class QRFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_q_r, container, false)
     }
 
-    private fun showQRResults(result:String, severity: String, url: String){
+    private fun showQRResults(result:String, severity: String, url: String, isMalicious: Boolean){
         val alertDialog: AlertDialog.Builder=AlertDialog.Builder(context)
         //TODO design custom layout
         val view = layoutInflater.inflate(R.layout.dialog_custom_qr,null)
@@ -58,6 +62,28 @@ class QRFragment : Fragment() {
         risk.setText("Severity is $severity")
         urlLink.setText("Scanned URL is $url")
         val dialog: AlertDialog = alertDialog.create()
+        //Code that adds the data to firebase
+        val firestore = FirebaseFirestore.getInstance()
+        val user = FirebaseAuth.getInstance().currentUser
+
+        if (user != null) {
+            val userDocRef = firestore.collection("QR").document(user.uid).collection("links").document()
+            val timestamp = FieldValue.serverTimestamp()
+            val linkData = hashMapOf(
+                "url" to url,
+                "isMalicious" to isMalicious,
+                "timestamp" to timestamp
+            )
+
+            userDocRef.set(linkData)
+                .addOnSuccessListener {
+                    Log.d(TAG, "Link added for user: ${user.uid}")
+                }
+                .addOnFailureListener { e ->
+                    Log.e(TAG, "Error adding link", e)
+                }
+        }
+
         exitButton.setOnClickListener() {
             dialog.dismiss()
             }
@@ -122,9 +148,11 @@ class QRFragment : Fragment() {
                     Log.d(TAG, "Mal count $maliciousCount and lastmalicous count $lastmaliciousCount")
                     if(maliciousCount<harmlessCount || lastmaliciousCount<2 ||risk=="low"){
                         scanVal="Harmless"
+                        isMalicious=false
                     }
                     if(maliciousCount>harmlessCount || lastmaliciousCount >2 ||risk=="high"){
                         scanVal="Malicious"
+                        isMalicious=true
                     }
                     Log.d(TAG,"Scan and url are: $scanVal and $urlScanned")
                 } else {
@@ -136,7 +164,7 @@ class QRFragment : Fragment() {
             }
         })
         handler.postDelayed({
-            showQRResults(scanVal,risk,urlScanned)
+            showQRResults(scanVal,risk,urlScanned, isMalicious)
         },3500)
 
         /**/
@@ -147,10 +175,10 @@ class QRFragment : Fragment() {
         activityResultLauncher.launch(arrayOf(android.Manifest.permission.CAMERA))
         codeScanner = CodeScanner(activity, scannerView)
         codeScanner.camera=CodeScanner.CAMERA_BACK
-        val url = "https://www.google.com/"
-        val urlId = Base64.getUrlEncoder().withoutPadding().encodeToString(url.toByteArray(
-            StandardCharsets.UTF_8))
-        checkURL(urlId)
+        //val url = "https://www.google.com/"
+        //val urlId = Base64.getUrlEncoder().withoutPadding().encodeToString(url.toByteArray(
+          //  StandardCharsets.UTF_8))
+        //checkURL(urlId)
         codeScanner.decodeCallback = DecodeCallback {
             activity.runOnUiThread {
                 val url = it.text.toString()
@@ -191,5 +219,6 @@ class QRFragment : Fragment() {
         }
 
 }
+
 
 

@@ -133,7 +133,12 @@ class ProfileFragment : Fragment() {
         binding.textView12.setOnClickListener {
             goToAIActivity(view = null)
         }
-
+        binding.textView11.setOnClickListener {
+            gotoqrActivity(view=null)
+        }
+        binding.textView13.setOnClickListener {
+            gotoqrActivity(view = null)
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -157,6 +162,11 @@ class ProfileFragment : Fragment() {
         startActivity(intent)
     }
 
+    private fun gotoqrActivity(view: View?) {
+        val intent = Intent(requireContext(), QrHistory::class.java)
+        startActivity(intent)
+    }
+
     fun goToAIActivity(view: View?) {
         val intent = Intent(requireContext(), Account_Information::class.java)
         startActivity(intent)
@@ -176,9 +186,9 @@ class ProfileFragment : Fragment() {
             val randomMinutes = random.nextInt(60)
 
             val calendar = Calendar.getInstance()
-            //calendar.add(Calendar.HOUR_OF_DAY, randomHours)
-            //calendar.add(Calendar.MINUTE, randomMinutes)
-            calendar.add(Calendar.SECOND, 1)
+            calendar.add(Calendar.HOUR_OF_DAY, randomHours)
+            calendar.add(Calendar.MINUTE, randomMinutes)
+            calendar.add(Calendar.SECOND, 0)
 
             alarmManager.set(
                 AlarmManager.RTC_WAKEUP,
