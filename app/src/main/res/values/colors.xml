@@ -11,5 +11,7 @@
     <color name="background_color_light">#FFFFFF</color>
     <color name="dark_text">#FFFFFF</color>
     <color name="text_color_light">#000000</color>
+    <color name="red">#FF0000</color>
+    <color name="green">#03C603</color>
 
 </resources>

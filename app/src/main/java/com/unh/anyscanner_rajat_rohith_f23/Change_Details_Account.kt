@@ -70,10 +70,10 @@ class Change_Details_Account : AppCompatActivity() {
             if (fname == "") {
                 binding.firstNameEt.error = "Field Required"
             }
-            if (lname == "") {
+            else if (lname == "") {
                 binding.lastNameEt.error = "Field Required"
             }
-            if (email == "") {
+            else if (email == "") {
                 binding.emailEt.error = "Field Required"
             } else if (!isValidEmail(email)) {
                 binding.emailEt.error = "Enter a valid email"
