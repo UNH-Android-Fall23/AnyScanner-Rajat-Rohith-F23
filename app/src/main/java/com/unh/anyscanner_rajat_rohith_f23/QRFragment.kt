@@ -1,14 +1,14 @@
 package com.unh.anyscanner_rajat_rohith_f23
 
+import android.R.color
 import android.app.AlertDialog
-import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,18 +16,19 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.fragment.app.Fragment
 import com.budiyev.android.codescanner.CodeScanner
 import com.budiyev.android.codescanner.CodeScannerView
 import com.budiyev.android.codescanner.DecodeCallback
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.zxing.BarcodeFormat
+import okhttp3.*
+import org.json.JSONObject
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.util.Base64
-import okhttp3.*
-import org.json.JSONObject
-
 
 
 class QRFragment : Fragment() {
@@ -58,6 +59,11 @@ class QRFragment : Fragment() {
         val exitButton=view.findViewById<Button>(R.id.dialogDismiss_button)
         val visitButton=view.findViewById<Button>(R.id.dialogPositive_button)
         alertDialog.setView(view)
+        if(result=="Harmless"){
+            title.setTextColor(Color.GREEN)
+        }else{
+            title.setTextColor(Color.RED)
+        }
         title.setText("This QR is $result")
         risk.setText("Severity is $severity")
         urlLink.setText("Scanned URL is $url")
@@ -175,9 +181,9 @@ class QRFragment : Fragment() {
         activityResultLauncher.launch(arrayOf(android.Manifest.permission.CAMERA))
         codeScanner = CodeScanner(activity, scannerView)
         codeScanner.camera=CodeScanner.CAMERA_BACK
+        codeScanner.formats= listOf(BarcodeFormat.QR_CODE)
         //val url = "https://www.google.com/"
-        //val urlId = Base64.getUrlEncoder().withoutPadding().encodeToString(url.toByteArray(
-          //  StandardCharsets.UTF_8))
+        //val urlId = Base64.getUrlEncoder().withoutPadding().encodeToString(url.toByteArray( StandardCharsets.UTF_8))
         //checkURL(urlId)
         codeScanner.decodeCallback = DecodeCallback {
             activity.runOnUiThread {
