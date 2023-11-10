@@ -7,8 +7,13 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class WIFIRecyclerAdapter(private val dataSet: Array<String>,private val dataSet2: Array<String>, private val connectedPosition: Int) :
+class WIFIRecyclerAdapter(private val dataSet: Array<String>,
+                          private val dataSet2: Array<String>,
+                          private val connectedPosition: Int) :
     RecyclerView.Adapter<WIFIRecyclerAdapter.ViewHolder>() {
+    interface ItemClickListener {
+        fun onItemClick(position: Int)
+    }
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val wifiSSID: TextView
         val wifiSecurity: TextView
@@ -20,7 +25,11 @@ class WIFIRecyclerAdapter(private val dataSet: Array<String>,private val dataSet
 
         }
     }
+    private var itemClickListener: ItemClickListener? = null
 
+    fun setItemClickListener(listener: ItemClickListener) {
+        itemClickListener = listener
+    }
     // Create new views (invoked by the layout manager)
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
         // Create a new view, which defines the UI of the list item
@@ -42,6 +51,9 @@ class WIFIRecyclerAdapter(private val dataSet: Array<String>,private val dataSet
             viewHolder.itemView.setBackgroundColor(Color.parseColor("#FFD700")) // Use your desired highlight color
         } else {
             viewHolder.itemView.setBackgroundColor(Color.TRANSPARENT)
+        }
+        viewHolder.itemView.setOnClickListener {
+            itemClickListener?.onItemClick(position)
         }
 
     }

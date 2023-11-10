@@ -5,10 +5,12 @@
     android:layout_height="match_parent"
     tools:context=".RootFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Root" />
+  <com.google.android.material.button.MaterialButton
+      android:id="@+id/checkRootBtn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Check root"
+      android:layout_margin="150dp"/>
+
 
 </FrameLayout>

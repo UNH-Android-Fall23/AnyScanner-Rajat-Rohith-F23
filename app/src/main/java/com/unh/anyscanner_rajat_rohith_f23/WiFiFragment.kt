@@ -26,6 +26,9 @@ class WiFiFragment : Fragment() {
     private lateinit var wifiManager: WifiManager
     private val TAG="AnyScannerF23"
     private var connectedSSID: String = ""
+    private var wifiSSID: Array<String> = arrayOf("", "")
+    private var wifiCapabilites: Array<String> = arrayOf("", "")
+
     private var wifiScanResults: List<ScanResult> =listOf(
         ScanResult().apply {
             SSID = "SSID1"
@@ -34,9 +37,6 @@ class WiFiFragment : Fragment() {
     )
 
     private var _binding: FragmentWiFiBinding? = null
-
-    // with the backing property of the kotlin we extract
-    // the non null value of the _binding
     private val binding get() = _binding!!
 
 
@@ -79,18 +79,42 @@ class WiFiFragment : Fragment() {
         Log.d(TAG, "result is ${wifiScanResults.toString()}")
         updateConnectedSSID()
 
-        val ssids = wifiScanResults.map { it.SSID }.toTypedArray()
-        val capabilities = wifiScanResults.map { it.capabilities }.toTypedArray()
-        val connectedPosition = ssids.indexOf(connectedSSID)
-        val customAdapter = WIFIRecyclerAdapter(ssids, capabilities, connectedPosition)
+        wifiSSID = wifiScanResults.map { it.SSID }.toTypedArray()
+        wifiCapabilites = wifiScanResults.map { it.capabilities }.toTypedArray()
+        val connectedPosition = wifiSSID.indexOf(connectedSSID)
+        val customAdapter = WIFIRecyclerAdapter(wifiSSID, wifiCapabilites, connectedPosition)
 
+        customAdapter.setItemClickListener(object : WIFIRecyclerAdapter.ItemClickListener {
+            override fun onItemClick(position: Int) {
+                // Handle item click, e.g., navigate to WifiDetailFragment
+                openDestinationFragment()
+            }
+        })
 
         val recyclerView= binding.wifiRecycler
         recyclerView.adapter = customAdapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         Log.d(TAG,"result is ${wifiScanResults.toString()}")
     }
+    private fun openDestinationFragment() {
+        // Create a new instance of the DestinationFragment
+        val destinationFragment = WifiDetailsFragment()
+        val args = Bundle()
+        args.putString("connectedSSID", connectedSSID)
+        args.putStringArray("SSIDArray", wifiSSID)
+        args.putStringArray("capabilityArray", wifiCapabilites)
+        destinationFragment.arguments = args
 
+        // Create a FragmentTransaction to replace the current fragment with the destination fragment
+        val transaction = parentFragmentManager.beginTransaction()
+        transaction.replace(R.id.activity_main_nav_host, destinationFragment)
+
+        // Add the transaction to the back stack so the user can navigate back
+        transaction.addToBackStack(null)
+
+        // Commit the transaction
+        transaction.commit()
+    }
     private fun scanFailure() {
         // handle failure: new scan did NOT succeed
         // consider using old scan results: these are the OLD results!

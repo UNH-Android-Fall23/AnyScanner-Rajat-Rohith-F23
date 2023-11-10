@@ -5,7 +5,8 @@
     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".WiFiFragment">
+    tools:context=".WiFiFragment"
+    android:id="@+id/wifiFragmentRelative">
 
 
     <androidx.recyclerview.widget.RecyclerView

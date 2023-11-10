@@ -16,6 +16,7 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.budiyev.android.codescanner.CodeScanner
 import com.budiyev.android.codescanner.CodeScannerView
@@ -60,9 +61,9 @@ class QRFragment : Fragment() {
         val visitButton=view.findViewById<Button>(R.id.dialogPositive_button)
         alertDialog.setView(view)
         if(result=="Harmless"){
-            title.setTextColor(Color.GREEN)
+            title.setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
         }else{
-            title.setTextColor(Color.RED)
+            title.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
         }
         title.setText("This QR is $result")
         risk.setText("Severity is $severity")
