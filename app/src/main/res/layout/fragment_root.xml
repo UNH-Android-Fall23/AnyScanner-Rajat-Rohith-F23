@@ -1,16 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".RootFragment">
 
-  <com.google.android.material.button.MaterialButton
+  <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:tools="http://schemas.android.com/tools"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      tools:context=".RootFragment">
+  <androidx.appcompat.widget.AppCompatImageButton
       android:id="@+id/checkRootBtn"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="Check root"
-      android:layout_margin="150dp"/>
+      android:src="@drawable/checkroot"
+      android:background="@android:color/transparent"
+      android:layout_centerInParent="true"/>
+
+  <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/rootUpdate"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/checkRootBtn"
+      android:layout_centerInParent="true"
+      android:layout_margin="50dp"/>
 
 
-</FrameLayout>
+</RelativeLayout>
