@@ -87,7 +87,7 @@ class WiFiFragment : Fragment() {
         customAdapter.setItemClickListener(object : WIFIRecyclerAdapter.ItemClickListener {
             override fun onItemClick(position: Int) {
                 // Handle item click, e.g., navigate to WifiDetailFragment
-                openDestinationFragment()
+                openDestinationFragment(position)
             }
         })
 
@@ -96,13 +96,13 @@ class WiFiFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         Log.d(TAG,"result is ${wifiScanResults.toString()}")
     }
-    private fun openDestinationFragment() {
+    private fun openDestinationFragment(position: Int) {
         // Create a new instance of the DestinationFragment
         val destinationFragment = WifiDetailsFragment()
         val args = Bundle()
         args.putString("connectedSSID", connectedSSID)
-        args.putStringArray("SSIDArray", wifiSSID)
-        args.putStringArray("capabilityArray", wifiCapabilites)
+        args.putString("selectedSSID", wifiSSID[position])
+        args.putString("selectedCapability", wifiCapabilites[position])
         destinationFragment.arguments = args
 
         // Create a FragmentTransaction to replace the current fragment with the destination fragment

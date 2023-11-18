@@ -63,12 +63,10 @@ class RootFragment : Fragment() {
         if (rootBeer.isRooted) {
             // Device is rooted
             // Handle rooted device scenario
-            Log.d(TAG,"rooted")
+            logTextView.text = "Device is Rooted"
         } else {
             // Device is not rooted
-            Log.d(TAG,"not-rooted ")
-
-            // Handle non-rooted device scenario
+            logTextView.text = "Device is Not-Rooted"
         }
     }
 
