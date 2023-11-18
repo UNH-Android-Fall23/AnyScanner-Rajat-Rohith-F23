@@ -1,5 +1,6 @@
 package com.unh.anyscanner_rajat_rohith_f23
 
+import WifiDetailsFragment
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
