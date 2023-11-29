@@ -46,16 +46,21 @@ class WifiDetailsFragment : Fragment() {
                 val timeout = 5000 // Replace with your desired timeout in milliseconds
 
                 val results = checkPorts(localIpAddress, ports, timeout)
+                val resultStringBuilder = StringBuilder()
 
                 for ((port, isOpen) in results) {
-                    if (isOpen) {
-                        portVal="Port $port is open on $localIpAddress"
+                    val result = if (isOpen) {
+                        "Port $port is open on $localIpAddress"
                     } else {
-                        portVal="Port $port is closed on $localIpAddress"
+                        "Port $port is closed on $localIpAddress"
                     }
+                    resultStringBuilder.append(result).append(", ")
                 }
+
+                val finalResult = resultStringBuilder.toString().trimEnd(',')
+                portVal=finalResult
             } else {
-                println("Failed to retrieve local IP address.")
+                println("Failed to retrieve the local IP address.")
             }
 
             // Display details in the UI
