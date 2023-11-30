@@ -17,13 +17,19 @@ import com.google.firebase.firestore.FirebaseFirestore
 import android.graphics.Rect
 import android.widget.ImageButton
 import com.google.firebase.firestore.Query
+import com.unh.anyscanner_rajat_rohith_f23.databinding.ActivityMainBinding
+import com.unh.anyscanner_rajat_rohith_f23.databinding.ActivityQrHistoryBinding
 
 class QrHistory : AppCompatActivity() {
     private lateinit var qrLinkAdapter: QrLinkAdapter
+    private lateinit var binding: ActivityQrHistoryBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_qr_history)
+
+        binding = ActivityQrHistoryBinding.inflate(layoutInflater)
+        setContentView((binding.root))
 
         val recyclerView = findViewById<RecyclerView>(R.id.QrRecycler)
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -50,6 +56,11 @@ class QrHistory : AppCompatActivity() {
                     val url = document.getString("url") ?: ""
                     val isMalicious = document.getBoolean("isMalicious") ?: false
                     QrLink(url, isMalicious)
+                }
+                if (qrLinks.isNullOrEmpty()) {
+                    binding.textView15.text = "No History Available"
+                } else {
+                    binding.textView15.text = ""
                 }
                 qrLinkAdapter.submitList(qrLinks)
             }
