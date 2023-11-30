@@ -113,7 +113,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.loginBtn.setOnClickListener {
-            /* var passwordMatched = false
+             var passwordMatched = false
             val username = binding.editTextTextEmailAddress2
             val password = binding.editTextTextPassword
             if (username.text.toString() == "") {
@@ -173,8 +173,8 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-            */
-            goToqrActivity(view = null)
+
+            //goToqrActivity(view = null)
         }
         launcher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
