@@ -10,14 +10,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Wi-Fi SSID: "
-        android:layout_centerInParent="true"/>
+        android:layout_centerInParent="true" />
+
     <TextView
         android:id="@+id/wifiSecurityTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Wi-Fi Security: "
         android:layout_below="@id/wifiSSIDTextView"
-        android:layout_centerInParent="true"/>
+        android:layout_centerInParent="true"
+        android:text="Wi-Fi Security: "
+        android:layout_margin="15dp"/>
 
     <TextView
         android:id="@+id/wifiDetailsTextView"
@@ -26,7 +28,7 @@
         android:layout_below="@id/wifiSecurityTextView"
         android:layout_centerInParent="true"
         android:text="sdasd"
-        android:layout_margin="10dp"
+        android:layout_margin="15dp"
         />
 
     <!-- Other views go here -->
