@@ -18,7 +18,7 @@ android {
     }
     defaultConfig {
         applicationId = "com.unh.anyscanner_rajat_rohith_f23"
-        minSdk = 31
+        minSdk = 30
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
