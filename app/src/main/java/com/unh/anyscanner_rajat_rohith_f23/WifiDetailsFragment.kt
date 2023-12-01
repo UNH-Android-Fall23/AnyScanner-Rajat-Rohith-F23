@@ -2,7 +2,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import androidx.navigation.Navigation.findNavController
 import com.unh.anyscanner_rajat_rohith_f23.databinding.FragmentWifiDetailsBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -71,6 +73,14 @@ class WifiDetailsFragment : Fragment() {
                 binding.wifiDetailsTextView.text=portVal
             }
         }
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                // Navigate back to WiFiFragment
+                findNavController(view).navigateUp()
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
+
     }
 
     override fun onDestroyView() {

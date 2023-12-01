@@ -16,6 +16,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.RotateAnimation
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -39,7 +41,7 @@ class WiFiFragment : Fragment() {
 
     private var _binding: FragmentWiFiBinding? = null
     private val binding get() = _binding!!
-
+    private lateinit var wifiScanReceiver: BroadcastReceiver
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +62,7 @@ class WiFiFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         wifiManager = activity?.getSystemService(Context.WIFI_SERVICE) as WifiManager
-       askPermission()
+        askPermission()
         val scanButton= binding.scanBtn
         scanButton.setOnClickListener {
             scanWifi()
@@ -69,6 +71,17 @@ class WiFiFragment : Fragment() {
         val customAdapter = WIFIRecyclerAdapter(arrayOf(), arrayOf(),0)
         recyclerView.adapter = customAdapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+        // Unregister the receiver when the fragment is destroyed
+        try {
+            requireContext().unregisterReceiver(wifiScanReceiver)
+        } catch (e: IllegalArgumentException) {
+            // Receiver was not registered, ignore
+        }
     }
     @SuppressLint("MissingPermission")
     private fun scanSuccess() {
@@ -124,7 +137,8 @@ class WiFiFragment : Fragment() {
     }
     fun scanWifi(){
 
-        val wifiScanReceiver = object : BroadcastReceiver() {
+        startScanAnimation()
+         wifiScanReceiver = object : BroadcastReceiver() {
 
             override fun onReceive(context: Context, intent: Intent) {
                 val success = intent.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, false)
@@ -133,19 +147,45 @@ class WiFiFragment : Fragment() {
                 } else {
                     scanFailure()
                 }
+                stopScanAnimation()
             }
         }
 
         val intentFilter = IntentFilter()
         intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)
+
+        // Unregister the receiver if it was registered before (precaution)
+        try {
+            requireContext().unregisterReceiver(wifiScanReceiver)
+        } catch (e: IllegalArgumentException) {
+            // Receiver was not registered, ignore
+        }
         requireContext().registerReceiver(wifiScanReceiver, intentFilter)
 
         val success = wifiManager.startScan()
         if (!success) {
             // scan failure handling
             scanFailure()
+            stopScanAnimation()
         }
+    }
 
+    private fun startScanAnimation() {
+        val rotate = RotateAnimation(
+            0f,
+            360f,
+            Animation.RELATIVE_TO_SELF,
+            0.5f,
+            Animation.RELATIVE_TO_SELF,
+            0.5f
+        )
+        rotate.duration = 1000
+        rotate.repeatCount = Animation.INFINITE
+        binding.scanBtn.startAnimation(rotate)
+    }
+
+    private fun stopScanAnimation() {
+        binding.scanBtn.clearAnimation()
     }
     fun askPermission(){
 
