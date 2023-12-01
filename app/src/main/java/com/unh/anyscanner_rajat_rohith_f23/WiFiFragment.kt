@@ -41,7 +41,7 @@ class WiFiFragment : Fragment() {
 
     private var _binding: FragmentWiFiBinding? = null
     private val binding get() = _binding!!
-    private lateinit var wifiScanReceiver: BroadcastReceiver
+    private var wifiScanReceiver: BroadcastReceiver? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -153,13 +153,6 @@ class WiFiFragment : Fragment() {
 
         val intentFilter = IntentFilter()
         intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)
-
-        // Unregister the receiver if it was registered before (precaution)
-        try {
-            requireContext().unregisterReceiver(wifiScanReceiver)
-        } catch (e: IllegalArgumentException) {
-            // Receiver was not registered, ignore
-        }
         requireContext().registerReceiver(wifiScanReceiver, intentFilter)
 
         val success = wifiManager.startScan()
