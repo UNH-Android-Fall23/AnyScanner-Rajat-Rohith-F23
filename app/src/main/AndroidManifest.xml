@@ -47,6 +47,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AnyScannerRajatRohithF23"
         tools:targetApi="33">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCwg2SXD5L1r5Yifgw5HYs7kMUX5AO_DJs" />
         <activity
             android:name=".Preview"
             android:exported="true">
