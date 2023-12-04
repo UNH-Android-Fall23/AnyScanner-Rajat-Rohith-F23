@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -153,14 +154,17 @@ class WiFiFragment : Fragment(), OnMapReadyCallback {
             fusedLocationClient.lastLocation
                 .addOnSuccessListener { location ->
                     location?.let {
-                        if (!isScanning)
-                            displayWifiOnMap(
-                                wifiManager.scanResults,
-                                LatLng(location.latitude, location.longitude)
-                            )
+                        if (!isScanning) {
+                            displayWifiOnMap(wifiManager.scanResults, LatLng(location.latitude, location.longitude))
+                            moveCameraToLocation(LatLng(location.latitude, location.longitude))
+                        }
                     }
                 }
         }
+    }
+    private fun moveCameraToLocation(location: LatLng) {
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(location))
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 15.0f)) // You can adjust the zoom level as needed
     }
 
 
