@@ -47,9 +47,21 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AnyScannerRajatRohithF23"
         tools:targetApi="33">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCwg2SXD5L1r5Yifgw5HYs7kMUX5AO_DJs" />
+        <activity
+            android:name=".Preview"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".QrHistory"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".Change_Details_Account"
             android:exported="true"
@@ -78,11 +90,6 @@
             android:name=".MainActivity"
             android:exported="true"
             android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <receiver android:name=".ProfileFragment$NotificationReceiver" />

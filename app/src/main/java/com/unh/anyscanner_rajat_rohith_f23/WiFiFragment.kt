@@ -1,251 +1,356 @@
 package com.unh.anyscanner_rajat_rohith_f23
 
-import WifiDetailsFragment
 import android.Manifest
-import android.annotation.SuppressLint
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.location.Location
 import android.net.wifi.ScanResult
 import android.net.wifi.WifiManager
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
-import android.view.animation.RotateAnimation
+import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.unh.anyscanner_rajat_rohith_f23.databinding.FragmentWiFiBinding
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.Circle
+import com.google.android.gms.maps.model.CircleOptions
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.net.InetSocketAddress
+import java.net.NetworkInterface
+import java.net.Socket
+import java.net.SocketException
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
-class WiFiFragment : Fragment() {
+class WiFiFragment : Fragment(), OnMapReadyCallback {
 
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var mMap: GoogleMap
     private lateinit var wifiManager: WifiManager
-    private val TAG="AnyScannerF23"
-    private var connectedSSID: String = ""
-    private var wifiSSID: Array<String> = arrayOf("", "")
-    private var wifiCapabilites: Array<String> = arrayOf("", "")
-
-    private var wifiScanResults: List<ScanResult> =listOf(
-        ScanResult().apply {
-            SSID = "SSID1"
-            capabilities = "Capabilities1"
-        }
-    )
-
-    private var _binding: FragmentWiFiBinding? = null
-    private val binding get() = _binding!!
-    private var wifiScanReceiver: BroadcastReceiver? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
+    private val LOCATION_PERMISSION_REQUEST_CODE = 1
+    private val WIFI_PERMISSION_REQUEST_CODE = 2
+    private var isScanning = false
+    private val circleList: MutableList<Pair<Circle, ScanResult>> = mutableListOf()
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        _binding = FragmentWiFiBinding.inflate(inflater, container, false)
-        //TODO this might cause error add check
-        updateConnectedSSID()
-        return binding.root
+        activityResultLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION))
+        val view = inflater.inflate(R.layout.fragment_wi_fi, container, false)
+         if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+       ) {
+             ActivityCompat.requestPermissions(
+                 requireActivity(),
+                 arrayOf(
+                     Manifest.permission.ACCESS_FINE_LOCATION,
+                     Manifest.permission.ACCESS_COARSE_LOCATION
+                 ),
+                 LOCATION_PERMISSION_REQUEST_CODE
+             )
+         }else {
+             val mapFragment =
+                 childFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment
+             mapFragment.getMapAsync(this)
+
+             fusedLocationClient =
+                 LocationServices.getFusedLocationProviderClient(requireActivity())
+             wifiManager =
+                 requireActivity().applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+
+             val scanButton = view.findViewById<Button>(R.id.scanButton)
+             scanButton.setOnClickListener {
+                 if (ActivityCompat.checkSelfPermission(
+                         requireContext(),
+                         Manifest.permission.ACCESS_FINE_LOCATION
+                     ) == PackageManager.PERMISSION_GRANTED &&
+                     ActivityCompat.checkSelfPermission(
+                         requireContext(),
+                         Manifest.permission.ACCESS_COARSE_LOCATION
+                     ) == PackageManager.PERMISSION_GRANTED
+                 ) {
+                     mMap.clear()
+                     getDeviceLocation()
+                 } else {
+                     ActivityCompat.requestPermissions(
+                         requireActivity(),
+                         arrayOf(
+                             Manifest.permission.ACCESS_FINE_LOCATION,
+                             Manifest.permission.ACCESS_COARSE_LOCATION
+                         ),
+                         LOCATION_PERMISSION_REQUEST_CODE
+                     )
+                 }
+             }
+         }
+        return view
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        wifiManager = activity?.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        askPermission()
-        val scanButton= binding.scanBtn
-        scanButton.setOnClickListener {
-            scanWifi()
-        }
-        val recyclerView= binding.wifiRecycler
-        val customAdapter = WIFIRecyclerAdapter(arrayOf(), arrayOf(),0)
-        recyclerView.adapter = customAdapter
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-        // Unregister the receiver when the fragment is destroyed
-        try {
-            requireContext().unregisterReceiver(wifiScanReceiver)
-        } catch (e: IllegalArgumentException) {
-            // Receiver was not registered, ignore
-        }
-    }
-    @SuppressLint("MissingPermission")
-    private fun scanSuccess() {
-        val filteredResults = wifiManager.scanResults
-            .filter { it.SSID.isNotEmpty() } // Filter out blank SSIDs
-            .distinctBy { it.SSID } // Remove duplicate SSIDs
-
-        wifiScanResults = filteredResults
-        Log.d(TAG, "result is ${wifiScanResults.toString()}")
-        updateConnectedSSID()
-
-        wifiSSID = wifiScanResults.map { it.SSID }.toTypedArray()
-        wifiCapabilites = wifiScanResults.map { it.capabilities }.toTypedArray()
-        val connectedPosition = wifiSSID.indexOf(connectedSSID)
-        val customAdapter = WIFIRecyclerAdapter(wifiSSID, wifiCapabilites, connectedPosition)
-
-        customAdapter.setItemClickListener(object : WIFIRecyclerAdapter.ItemClickListener {
-            override fun onItemClick(position: Int) {
-                // Handle item click, e.g., navigate to WifiDetailFragment
-                openDestinationFragment(position)
-            }
-        })
-
-        val recyclerView= binding.wifiRecycler
-        recyclerView.adapter = customAdapter
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        Log.d(TAG,"result is ${wifiScanResults.toString()}")
-    }
-    private fun openDestinationFragment(position: Int) {
-        // Create a new instance of the DestinationFragment
-        val destinationFragment = WifiDetailsFragment()
-        val args = Bundle()
-        args.putString("connectedSSID", connectedSSID)
-        args.putString("selectedSSID", wifiSSID[position])
-        args.putString("selectedCapability", wifiCapabilites[position])
-        destinationFragment.arguments = args
-
-        // Create a FragmentTransaction to replace the current fragment with the destination fragment
-        val transaction = parentFragmentManager.beginTransaction()
-        transaction.replace(R.id.activity_main_nav_host, destinationFragment)
-
-        // Add the transaction to the back stack so the user can navigate back
-        transaction.addToBackStack(null)
-
-        // Commit the transaction
-        transaction.commit()
-    }
-    private fun scanFailure() {
-        // handle failure: new scan did NOT succeed
-        // consider using old scan results: these are the OLD results!
-      //  val results = wifiManager.scanResults
-      Log.d(TAG,"Scan failed")
-    }
-    fun scanWifi(){
-
-        startScanAnimation()
-         wifiScanReceiver = object : BroadcastReceiver() {
-
-            override fun onReceive(context: Context, intent: Intent) {
-                val success = intent.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, false)
-                if (success) {
-                    scanSuccess()
-                } else {
-                    scanFailure()
-                }
-                stopScanAnimation()
-            }
-        }
-
-        val intentFilter = IntentFilter()
-        intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)
-        requireContext().registerReceiver(wifiScanReceiver, intentFilter)
-
-        val success = wifiManager.startScan()
-        if (!success) {
-            // scan failure handling
-            scanFailure()
-            stopScanAnimation()
+    override fun onMapReady(googleMap: GoogleMap) {
+        mMap = googleMap
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            mMap.isMyLocationEnabled = true
+            mMap.uiSettings.isMyLocationButtonEnabled = true
+        } else {
+            ActivityCompat.requestPermissions(
+                requireActivity(),
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
         }
     }
 
-    private fun startScanAnimation() {
-        val rotate = RotateAnimation(
-            0f,
-            360f,
-            Animation.RELATIVE_TO_SELF,
-            0.5f,
-            Animation.RELATIVE_TO_SELF,
-            0.5f
-        )
-        rotate.duration = 1000
-        rotate.repeatCount = Animation.INFINITE
-        binding.scanBtn.startAnimation(rotate)
-    }
-
-    private fun stopScanAnimation() {
-        binding.scanBtn.clearAnimation()
-    }
-    fun askPermission(){
-
-        if (ContextCompat.checkSelfPermission(requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION) !==
-            PackageManager.PERMISSION_GRANTED) {
-            Log.d(TAG,"Location not permitted")
-            if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(),
-                    Manifest.permission.ACCESS_FINE_LOCATION)) {
-                ActivityCompat.requestPermissions(requireActivity(),
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
-            } else {
-                ActivityCompat.requestPermissions(requireActivity(),
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
-            }
-        }
-        if (ContextCompat.checkSelfPermission(requireActivity(),
-                Manifest.permission.CHANGE_WIFI_STATE) !==
-            PackageManager.PERMISSION_GRANTED) {
-            Log.d(TAG,"Wifi not permitted")
-            if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(),
-                    Manifest.permission.CHANGE_WIFI_STATE)) {
-                ActivityCompat.requestPermissions(requireActivity(),
-                    arrayOf(Manifest.permission.CHANGE_WIFI_STATE), 1)
-            } else {
-                ActivityCompat.requestPermissions(requireActivity(),
-                    arrayOf(Manifest.permission.CHANGE_WIFI_STATE), 1)
-            }
-        }
-    }
-
-    @SuppressLint("MissingPermission")
-    fun updateConnectedSSID() {
-        val wifiManager = requireContext().getSystemService(Context.WIFI_SERVICE) as WifiManager
-        val wifiInfo = wifiManager.connectionInfo
-        connectedSSID = wifiInfo.ssid.replace("\"", "")
-    }
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
-                                            grantResults: IntArray) {
-        when (requestCode) {
-            1 -> {
-                if (grantResults.isNotEmpty() && grantResults[0] ==
-                    PackageManager.PERMISSION_GRANTED) {
-                    if ((ContextCompat.checkSelfPermission(requireActivity(),
-                            Manifest.permission.ACCESS_FINE_LOCATION) ===
-                                PackageManager.PERMISSION_GRANTED)) {
-                        Log.d(TAG,"Location permitted")
-                        Toast.makeText(requireContext(), "Permission Granted", Toast.LENGTH_SHORT).show()
+    private fun getDeviceLocation() {
+        if (::fusedLocationClient.isInitialized &&
+            ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            fusedLocationClient.lastLocation
+                .addOnSuccessListener { location ->
+                    location?.let {
+                        if (!isScanning) {
+                            displayWifiOnMap(wifiManager.scanResults, LatLng(location.latitude, location.longitude))
+                            moveCameraToLocation(LatLng(location.latitude, location.longitude))
+                        }
                     }
-                } else {
-                    Toast.makeText(requireContext(), "Permission Denied", Toast.LENGTH_SHORT).show()
                 }
-                if (grantResults.isNotEmpty() && grantResults[0] ==
-                    PackageManager.PERMISSION_GRANTED) {
-                    if ((ContextCompat.checkSelfPermission(requireActivity(),
-                            Manifest.permission.CHANGE_WIFI_STATE) ===
-                                PackageManager.PERMISSION_GRANTED)) {
-                        Log.d(TAG,"WiFi permitted")
-                        Toast.makeText(requireContext(), "Permission Granted", Toast.LENGTH_SHORT).show()
+        }
+    }
+    private fun moveCameraToLocation(location: LatLng) {
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(location))
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 15.0f)) // You can adjust the zoom level as needed
+    }
+
+
+    private fun displayWifiOnMap(scanResults: List<ScanResult>, liveLocation: LatLng) {
+        mMap.clear()
+
+        val circleList = mutableListOf<Pair<Circle, ScanResult>>()
+
+        for (result in scanResults) {
+            val wifiRange = calculateRadius(Math.abs(result.level))
+            val offsetLatitude = (Math.random() - 0.5) * 0.009
+            val offsetLongitude = (Math.random() - 0.5) * 0.009
+            val wifiLatitude = liveLocation.latitude + offsetLatitude
+            val wifiLongitude = liveLocation.longitude + offsetLongitude
+            val wifiLatLng = LatLng(wifiLatitude, wifiLongitude)
+            val circleOptions = CircleOptions()
+                .center(wifiLatLng)
+                .radius(wifiRange.toDouble())
+                .strokeWidth(2f)
+            if (result.BSSID == wifiManager.connectionInfo.bssid) {
+                circleOptions.strokeColor(ContextCompat.getColor(requireContext(), R.color.red))
+                circleOptions.fillColor(ContextCompat.getColor(requireContext(), R.color.red))
+            } else {
+                circleOptions.strokeColor(ContextCompat.getColor(requireContext(), R.color.green))
+                circleOptions.fillColor(ContextCompat.getColor(requireContext(), R.color.green))
+            }
+            val circle = mMap.addCircle(circleOptions)
+            circleList.add(Pair(circle, result))
+        }
+        mMap.setOnMapClickListener { latLng ->
+            for ((circle, scanResult) in circleList) {
+                val circleCenter = circle.center
+                val distance = FloatArray(1)
+                Location.distanceBetween(
+                    circleCenter.latitude,
+                    circleCenter.longitude,
+                    latLng.latitude,
+                    latLng.longitude,
+                    distance
+                )
+                if (distance[0] < circle.radius) {
+                    val wifiName = scanResult.SSID
+                    val wifiSecurity = scanResult.capabilities
+                    lifecycleScope.launch {
+                        val closedPortsInfo = getClosedPortsInfo(scanResult)
+                        val snippet =
+                            "SSID: $wifiName\nSecurity: $wifiSecurity\nClosed Ports: $closedPortsInfo"
+                        val truncatedSnippet = truncateTextToMaxLines(snippet, 5)
+                        val markerOptions = MarkerOptions().position(circleCenter)
+                            .title(wifiName)
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                            .snippet(truncatedSnippet)
+                        val marker = mMap.addMarker(markerOptions)
+                        marker?.showInfoWindow()
+                        mMap.setInfoWindowAdapter(CustomInfoWindowAdapter(requireContext()))
                     }
-                } else {
-                    Toast.makeText(requireContext(), "Permission Denied", Toast.LENGTH_SHORT).show()
+                    return@setOnMapClickListener
                 }
-                return
             }
         }
     }
 
+    private fun truncateTextToMaxLines(text: String, maxLines: Int): String {
+        val lines = text.split("\n")
+        if (lines.size > maxLines) {
+            return lines.take(maxLines).joinToString("\n") + "\n..."
+        }
+        return text
+    }
+
+    private fun calculateRadius(signalStrength: Int): Double {
+        return when {
+            signalStrength >= -50 -> 50.0
+            signalStrength >= -70 -> 100.0
+            else -> 150.0
+        }
+    }
+
+    private suspend fun getClosedPortsInfo(scanResult: ScanResult): String {
+        val localIpAddress = getLocalIpAddress()
+        return if (localIpAddress != null) {
+            val ports = listOf(80, 443, 22) // Ports to check
+            val timeout = 5000 // Timeout in milliseconds
+
+            val results = checkPorts(localIpAddress, ports, timeout)
+            val resultStringBuilder = StringBuilder()
+
+            for ((port, isOpen) in results) {
+                val result = if (isOpen) {
+                    "Port $port is open on $localIpAddress"
+                } else {
+                    "Port $port is closed on $localIpAddress"
+                }
+                resultStringBuilder.append(result).append(", ")
+            }
+
+            resultStringBuilder.toString().trimEnd(',')
+        } else {
+            "Failed to retrieve the local IP address."
+        }
+    }
+
+    private val activityResultLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            permissions.entries.forEach {
+                val permissionName = it.key
+                val isGranted = it.value
+                if (isGranted) {
+                    val mapFragment =
+                        childFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment
+                    mapFragment.getMapAsync(this)
+                } else {
+                    Toast.makeText(
+                        requireContext(), "Please enable permission to use this feature", Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+        }
+    class CustomInfoWindowAdapter(private val context: Context) : GoogleMap.InfoWindowAdapter {
+        override fun getInfoWindow(marker: Marker): View? {
+            return null
+        }
+
+        override fun getInfoContents(marker: Marker): View {
+            val infoView =
+                (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater)
+                    .inflate(R.layout.custom_info_window, null)
+
+            val titleTextView = infoView.findViewById<TextView>(R.id.titleTextView)
+            val snippetTextView = infoView.findViewById<TextView>(R.id.snippetTextView)
+            val title = marker.title
+            val snippet = marker.snippet
+
+            titleTextView.text = title
+            snippetTextView.text = snippet
+
+            return infoView
+        }
+    }
+
+    private suspend fun checkPorts(
+        ip: String,
+        ports: List<Int>,
+        timeout: Int
+    ): Map<Int, Boolean> {
+        val results = mutableMapOf<Int, Boolean>()
+
+        for (port in ports) {
+            results[port] = checkPort(ip, port, timeout)
+        }
+
+        return results
+    }
+
+    private suspend fun checkPort(ip: String, port: Int, timeout: Int): Boolean =
+        suspendCoroutine { continuation ->
+            GlobalScope.launch(Dispatchers.IO) {
+                try {
+                    val socket = Socket()
+                    socket.connect(InetSocketAddress(ip, port), timeout)
+                    socket.close()
+                    continuation.resume(true) // Port is open
+                } catch (e: Exception) {
+                    continuation.resume(false) // Port is closed or timeout
+                }
+            }
+        }
+
+    private suspend fun getLocalIpAddress(): String? =
+        withContext(Dispatchers.IO) {
+            try {
+                val en = NetworkInterface.getNetworkInterfaces()
+                while (en.hasMoreElements()) {
+                    val intf = en.nextElement()
+                    val enumIpAddr = intf.inetAddresses
+                    while (enumIpAddr.hasMoreElements()) {
+                        val inetAddress = enumIpAddr.nextElement()
+                        if (!inetAddress.isLoopbackAddress) {
+                            return@withContext inetAddress.hostAddress
+                        }
+                    }
+                }
+                null
+            } catch (ex: SocketException) {
+                null
+            }
+        }
 }
-
