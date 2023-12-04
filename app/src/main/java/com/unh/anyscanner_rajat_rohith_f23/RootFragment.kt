@@ -3,78 +3,103 @@ package com.unh.anyscanner_rajat_rohith_f23
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Base64
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
 import android.widget.TextView
+import android.widget.VideoView
+import androidx.fragment.app.Fragment
 import com.scottyab.rootbeer.RootBeer
 import com.unh.anyscanner_rajat_rohith_f23.databinding.FragmentRootBinding
-import java.io.OutputStream
-import java.io.PrintStream
-
 
 class RootFragment : Fragment() {
 
-
     private var _binding: FragmentRootBinding? = null
     private val binding get() = _binding!!
-    private val TAG="AnyScannerF23"
     private lateinit var logTextView: TextView
+    private lateinit var rootBeer: RootBeer
     private val handler = Handler(Looper.getMainLooper())
 
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
+    ): View {
         _binding = FragmentRootBinding.inflate(inflater, container, false)
+        val rootView = binding.root
         logTextView = binding.rootUpdate
+        rootBeer = RootBeer(requireContext())
+        val videoView = binding.videoView
         binding.checkRootBtn.setOnClickListener {
-            animateButton()
+            binding.imageView7.visibility = View.GONE
+            val videoPath = "android.resource://com.unh.anyscanner_rajat_rohith_f23/${R.raw.video}"
+            videoView.setVideoPath(videoPath)
+            videoView.start()
             redirectLogs()
-            checkRootStatus()
+
+            videoView.setOnCompletionListener {
+                checkRootStatus()
+            }
         }
-        return binding.root
-
+        return rootView
     }
+
+    private val MAX_LINES = 8
+
     private fun redirectLogs() {
-     //TODO set text view to fetch update from rootbeer logs
+        val process = Runtime.getRuntime().exec("logcat -d")
 
+        val bufferedReader = process.inputStream.bufferedReader()
+        val logs = StringBuilder()
+        rootBeer.isRooted
+
+        var lineCount = 0
+
+        bufferedReader.forEachLine { line ->
+            if (line.contains("LOOKING FOR BINARY")) {
+                logs.append(line).append("\n")
+
+                lineCount++
+                if (lineCount >= MAX_LINES) {
+                    val index = logs.indexOf("\n")
+                    logs.delete(0, index + 1)
+                }
+            }
+        }
+
+        updateLogTextView(logs.toString()) // Display logs in TextView
     }
+
 
     private fun updateLogTextView(logMessage: String) {
-        Log.d(TAG, "Updating log text: $logMessage")
-        handler.post {
-            val logText = "${logTextView.text}\n$logMessage"
-            logTextView.text = logText
+        logTextView.post {
+            logTextView.text = logMessage // Update TextView with logs
         }
     }
+
     private fun checkRootStatus() {
-        val rootBeer = RootBeer(requireContext())
+        logTextView.text = ""
+        val videoView = binding.videoView
         if (rootBeer.isRooted) {
-            // Device is rooted
-            // Handle rooted device scenario
-            logTextView.text = "Device is Rooted"
+            val videoPath = "android.resource://com.unh.anyscanner_rajat_rohith_f23/${R.raw.notsafe}"
+            videoView.setVideoPath(videoPath)
+            videoView.start()
+            videoView.setOnCompletionListener {
+                binding.imageView7.visibility = View.VISIBLE
+            }
+            logTextView.text="Device is Rooted"
         } else {
-            // Device is not rooted
-            logTextView.text = "Device is Not-Rooted"
+            val videoPath = "android.resource://com.unh.anyscanner_rajat_rohith_f23/${R.raw.safe}"
+            videoView.setVideoPath(videoPath)
+            videoView.start()
+            videoView.setOnCompletionListener {
+                binding.imageView7.visibility = View.VISIBLE
+            }
+            logTextView.text="Device is SAFE"
         }
     }
 
-    private fun animateButton() {
-        // Load the scale animation from the resources
-        val scaleAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.scale_animation)
-
-        // Start the animation on the button
-        binding.checkRootBtn.startAnimation(scaleAnimation)
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

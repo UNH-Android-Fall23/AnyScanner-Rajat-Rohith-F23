@@ -1,26 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-  <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:tools="http://schemas.android.com/tools"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      tools:context=".RootFragment">
-
-  <androidx.appcompat.widget.AppCompatImageButton
-      android:id="@+id/checkRootBtn"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_centerInParent="true"
-      android:background="@android:color/transparent"
-      android:src="@drawable/checkroot" />
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RootFragment">
 
   <com.google.android.material.textview.MaterialTextView
       android:id="@+id/rootUpdate"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_below="@id/checkRootBtn"
-      android:layout_centerInParent="true"
-      android:layout_margin="50dp"/>
+      android:layout_width="382dp"
+      android:layout_height="326dp"
+      android:textAlignment="center"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="0.482"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintVertical_bias="0.698" />
 
+  <VideoView
+      android:id="@+id/videoView"
+      android:layout_width="385dp"
+      android:layout_height="260dp"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="0.615"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintVertical_bias="0.048" />
 
-</RelativeLayout>
+  <Button
+      android:id="@+id/checkRootBtn"
+      android:layout_width="398dp"
+      android:layout_height="61dp"
+      android:text="Scan for device root"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="0.461"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintVertical_bias="0.908" />
+
+  <ImageView
+      android:id="@+id/imageView7"
+      android:layout_width="507dp"
+      android:layout_height="322dp"
+      android:src="@drawable/screenshot_2023_12_03_at_6_19_25_pm"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintVertical_bias="0.039" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
