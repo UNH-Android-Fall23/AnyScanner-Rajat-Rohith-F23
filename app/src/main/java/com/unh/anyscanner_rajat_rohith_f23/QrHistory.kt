@@ -65,6 +65,9 @@ class QrHistory : AppCompatActivity() {
                 qrLinkAdapter.submitList(qrLinks)
             }
         }
+        binding.textView.setOnClickListener {
+            onBackPressed()
+        }
     }
 }
 

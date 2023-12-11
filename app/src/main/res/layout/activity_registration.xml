@@ -25,7 +25,6 @@
         android:layout_height="wrap_content"
         android:padding="3dp"
         android:text="Sign Up"
-        app:backgroundTint="#0E0E0E"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.458"
