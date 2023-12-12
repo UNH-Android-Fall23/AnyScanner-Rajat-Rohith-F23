@@ -172,28 +172,35 @@ class WiFiFragment : Fragment(), OnMapReadyCallback {
         mMap.clear()
 
         val circleList = mutableListOf<Pair<Circle, ScanResult>>()
+        val uniqueSSIDs = mutableSetOf<String>()
 
         for (result in scanResults) {
-            val wifiRange = calculateRadius(Math.abs(result.level))
-            val offsetLatitude = (Math.random() - 0.5) * 0.009
-            val offsetLongitude = (Math.random() - 0.5) * 0.009
-            val wifiLatitude = liveLocation.latitude + offsetLatitude
-            val wifiLongitude = liveLocation.longitude + offsetLongitude
-            val wifiLatLng = LatLng(wifiLatitude, wifiLongitude)
-            val circleOptions = CircleOptions()
-                .center(wifiLatLng)
-                .radius(wifiRange.toDouble())
-                .strokeWidth(2f)
-            if (result.BSSID == wifiManager.connectionInfo.bssid) {
-                circleOptions.strokeColor(ContextCompat.getColor(requireContext(), R.color.red))
-                circleOptions.fillColor(ContextCompat.getColor(requireContext(), R.color.red))
-            } else {
-                circleOptions.strokeColor(ContextCompat.getColor(requireContext(), R.color.green))
-                circleOptions.fillColor(ContextCompat.getColor(requireContext(), R.color.green))
+            val wifiName = result.SSID
+            if (wifiName.isNotEmpty() && !uniqueSSIDs.contains(wifiName)) {
+                uniqueSSIDs.add(wifiName)
+
+                val wifiRange = calculateRadius(Math.abs(result.level))
+                val offsetLatitude = (Math.random() - 0.5) * 0.009
+                val offsetLongitude = (Math.random() - 0.5) * 0.009
+                val wifiLatitude = liveLocation.latitude + offsetLatitude
+                val wifiLongitude = liveLocation.longitude + offsetLongitude
+                val wifiLatLng = LatLng(wifiLatitude, wifiLongitude)
+                val circleOptions = CircleOptions()
+                    .center(wifiLatLng)
+                    .radius(wifiRange.toDouble())
+                    .strokeWidth(2f)
+                if (result.BSSID == wifiManager.connectionInfo.bssid) {
+                    circleOptions.strokeColor(ContextCompat.getColor(requireContext(), R.color.red))
+                    circleOptions.fillColor(ContextCompat.getColor(requireContext(), R.color.red))
+                } else {
+                    circleOptions.strokeColor(ContextCompat.getColor(requireContext(), R.color.green))
+                    circleOptions.fillColor(ContextCompat.getColor(requireContext(), R.color.green))
+                }
+                val circle = mMap.addCircle(circleOptions)
+                circleList.add(Pair(circle, result))
             }
-            val circle = mMap.addCircle(circleOptions)
-            circleList.add(Pair(circle, result))
         }
+
         mMap.setOnMapClickListener { latLng ->
             for ((circle, scanResult) in circleList) {
                 val circleCenter = circle.center
