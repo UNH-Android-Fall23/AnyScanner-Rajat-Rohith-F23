@@ -1,23 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Account_Information">
-
-    <ImageView
-        android:id="@+id/imageView6"
-        android:layout_width="271dp"
-        android:layout_height="172dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.385"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.089"
-        app:srcCompat="@drawable/screenshot_2023_10_09_at_9_00_04_am" />
-
+    android:orientation="vertical"
+    android:padding="16dp">
     <TextView
         android:id="@+id/textView"
         android:layout_width="55dp"
@@ -25,131 +13,121 @@
         android:text="&lt;"
         android:textAlignment="center"
         android:textSize="34sp"
-        android:textStyle="normal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.007" />
-
-    <TextView
-        android:id="@+id/textView14"
-        android:layout_width="154dp"
-        android:layout_height="48dp"
-        android:text=" Last Name:"
-        android:textColor="#594D4D"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.404" />
-
-    <TextView
-        android:id="@+id/textView22"
-        android:layout_width="97dp"
-        android:layout_height="46dp"
-        android:text=" Email:"
-        android:textColor="#594D4D"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.475" />
-
-    <TextView
-        android:id="@+id/textView20"
-        android:layout_width="152dp"
-        android:layout_height="43dp"
-        android:text=" First Name:"
-        android:textColor="#594D4D"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.325" />
-
-    <Button
-        android:id="@+id/button4"
-        android:layout_width="wrap_content"
+        android:textStyle="normal" />
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Change Account Details"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.426"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.59" />
+        android:orientation="vertical"
+        android:gravity="center">
+        <ImageView
+            android:id="@+id/imageView6"
+            android:layout_width="271dp"
+            android:layout_height="172dp"
+            app:srcCompat="@drawable/screenshot_2023_10_09_at_9_00_04_am" />
+    </LinearLayout>
 
-    <Button
-        android:id="@+id/button5"
-        android:layout_width="wrap_content"
+
+    <!-- First Pair -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Change Password"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.446"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.676" />
+        android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/textView17"
-        android:layout_width="234dp"
-        android:layout_height="43dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:text="No Name Provided"
-        android:textColor="#594D4D"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.977"
-        app:layout_constraintStart_toStartOf="@id/textView20"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.325"
-        android:layout_marginEnd="20dp"/>
+        <TextView
+            android:id="@+id/textView20"
+            android:layout_width="0dp"
+            android:layout_height="43dp"
+            android:layout_weight="1"
+            android:text=" First Name:"
+            android:textColor="#594D4D"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/textView17"
+            android:layout_width="0dp"
+            android:layout_height="43dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="No Name Provided"
+            android:textColor="#594D4D"
+            android:textSize="24sp" />
+    </LinearLayout>
 
-    <TextView
-        android:id="@+id/textView18"
-        android:layout_width="234dp"
-        android:layout_height="43dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:text="No Name Provided"
-        android:textColor="#594D4D"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.977"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.401"
-        android:layout_marginEnd="20dp"/>
-
-    <TextView
-        android:id="@+id/textView21"
-        android:layout_width="wrap_content"
+    <!-- Second Pair -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:text="No Email Provided"
-        android:textColor="#594D4D"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.804"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.466" />
+        android:orientation="horizontal">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/textView14"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text=" Last Name:"
+            android:textColor="#594D4D"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textView18"
+            android:layout_width="0dp"
+            android:layout_height="43dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="No Name Provided"
+            android:textColor="#594D4D"
+            android:textSize="24sp" />
+
+
+    </LinearLayout>
+
+    <!-- Fourth Pair -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/textView22"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_weight="1"
+            android:text=" Email:"
+            android:textColor="#594D4D"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/textView21"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="No Email Provided"
+            android:textColor="#594D4D"
+            android:textSize="24sp" />
+    </LinearLayout>
+    <!-- Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/button4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Change Account Details" />
+
+        <Button
+            android:id="@+id/button5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Change Password" />
+</LinearLayout>
+</LinearLayout>
