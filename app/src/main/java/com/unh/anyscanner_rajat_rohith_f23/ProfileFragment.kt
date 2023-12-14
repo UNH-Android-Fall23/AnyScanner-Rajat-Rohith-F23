@@ -186,8 +186,8 @@ class ProfileFragment : Fragment() {
             val randomMinutes = random.nextInt(60)
 
             val calendar = Calendar.getInstance()
-            calendar.add(Calendar.HOUR_OF_DAY, randomHours)
-            calendar.add(Calendar.MINUTE, randomMinutes)
+            calendar.add(Calendar.HOUR_OF_DAY, 0)
+            calendar.add(Calendar.MINUTE, 0)
             calendar.add(Calendar.SECOND, 0)
 
             alarmManager.set(
