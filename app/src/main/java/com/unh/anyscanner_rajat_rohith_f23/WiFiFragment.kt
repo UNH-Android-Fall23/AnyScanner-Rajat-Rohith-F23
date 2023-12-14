@@ -190,11 +190,11 @@ class WiFiFragment : Fragment(), OnMapReadyCallback {
                     .radius(wifiRange.toDouble())
                     .strokeWidth(2f)
                 if (result.BSSID == wifiManager.connectionInfo.bssid) {
-                    circleOptions.strokeColor(ContextCompat.getColor(requireContext(), R.color.red))
-                    circleOptions.fillColor(ContextCompat.getColor(requireContext(), R.color.red))
+                    circleOptions.strokeColor(ContextCompat.getColor(requireContext(), R.color.black))
+                    circleOptions.fillColor(ContextCompat.getColor(requireContext(), R.color.black))
                 } else {
-                    circleOptions.strokeColor(ContextCompat.getColor(requireContext(), R.color.green))
-                    circleOptions.fillColor(ContextCompat.getColor(requireContext(), R.color.green))
+                    circleOptions.strokeColor(ContextCompat.getColor(requireContext(), R.color.purple_500))
+                    circleOptions.fillColor(ContextCompat.getColor(requireContext(), R.color.purple_500))
                 }
                 val circle = mMap.addCircle(circleOptions)
                 circleList.add(Pair(circle, result))
